@@ -12,7 +12,7 @@ class Embedder:
     """
     def __init__(self):
         self.client = OpenAI(api_key=settings.openai_api_key)
-        self.model = settings.openai_model
+        self.model = settings.embedding_model
     def embed_documents(self, text: str) -> List[float]:
         """
         Embed 1 text

@@ -13,9 +13,9 @@ class TextProcessor:
     2. Chunk text with hierarchy
     3. 
     """
-    def __ini__(self):
+    def __init__(self):
         self.parser = LlamaParse(
-            api_key=settings.openai_api_key, 
+            api_key=settings.llama_cloud_api_key, 
             result_type="markdown",
             language="en",
             verbose=True
@@ -25,7 +25,7 @@ class TextProcessor:
             chunk_overlap=settings.chunk_overlap
         )
 
-    def process(
+    async def process(
         self,
         file_path: str, 
         metadata: Dict[str, Any]
@@ -52,7 +52,7 @@ class TextProcessor:
                 }
             ]
         """
-        documents = self.parser.load_data(file_path)
+        documents = await self.parser.aload_data(file_path)
 
         chunks = []
 
@@ -64,7 +64,7 @@ class TextProcessor:
                     "content":node.text,
                     "metadata": {
                         **metadata, #doc_id, company, year, quarter
-                        "page": node.page, 
+                        "page": node.metadata.get("page",1), 
                         "chunk_type": "text"
                     }
                 }

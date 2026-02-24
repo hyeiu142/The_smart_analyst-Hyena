@@ -22,6 +22,7 @@ class IngestionPipeline:
     async def process_document(
         self, 
         file_path: str, 
+        doc_id: str,
         metadata: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
@@ -48,14 +49,14 @@ class IngestionPipeline:
         print(f"\nStarting ingestion for doc_id: {doc_id}")
         metadata["doc_id"] = doc_id
 
-        text_chunks = self.text_processor.process(file_path, metadata)
+        text_chunks = await self.text_processor.process(file_path, metadata)
 
         print(f"Embedding {len(text_chunks)} text chunks...")
         contents = [chunk["content"] for chunk in text_chunks]
         embeddings = self.embedder.embed_batch(contents)
 
         for chunk, embedding in zip(text_chunks, embeddings): 
-            chunk["embedding"] = embedding
+            chunk["vector"] = embedding
             chunk["payload"] = {
                 "content": chunk["content"],
                 "metadata":chunk["metadata"]
@@ -72,7 +73,7 @@ class IngestionPipeline:
             "doc_id": doc_id, 
             "total_chunks": len(text_chunks),
             "text_chunks": len(text_chunks),
-            "table_chunks": 0, # TODO: later
-            "image_chunks": 0, # TODO: later
+            "table_chunks": 0, 
+            "image_chunks": 0,  
             "status": "completed"
         }

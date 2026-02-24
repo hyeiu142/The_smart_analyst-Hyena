@@ -104,12 +104,12 @@ class QdrantClientWrapper:
         Returns: 
             List of dicts: score + payload
         """
-        results = self.client.search(
+        results = self.client.query_points(
             collection_name=collection_name, 
-            query_vector=query_vector, 
+            query=query_vector, 
             limit=limit, 
             query_filter=filters
-        )
+        ).points
 
         return [
             {
@@ -154,7 +154,6 @@ class QdrantClientWrapper:
         info = self.client.get_collection(collection_name)
         return {
             "name": collection_name,
-            "vectors_count": info.vectors_count, 
             "points_count": info.points_count
         }
 
