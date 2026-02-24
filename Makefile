@@ -1,4 +1,4 @@
-.PHONY: up down logs dev test clean
+.PHONY: up down restart logs dev test clean
 
 # run all services
 up: 
@@ -7,6 +7,10 @@ up:
 # stop all services
 down: 
 	docker compose down
+
+# restart backend (picks up new .env)
+restart:
+	docker compose up -d --force-recreate backend
 
 build:
 	docker compose build
@@ -28,3 +32,11 @@ infra:
 # delete volumes
 clean: 
 	docker compose down -v
+
+# run Celery worker (dev mode - connects to Redis on localhost)
+worker:
+	REDIS_URL=redis://localhost:6379/0 celery -A backend.app.workers.celery_app worker --loglevel=info
+
+# init Qdrant collections (run once)
+init:
+	python scripts/init_collections.py

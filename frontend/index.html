@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>� Hyena — Financial Document Intelligence</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body class="light">
+
+<!-- ═══════════════════════════════════════════════ HEADER ══ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="logo">🐾 HYENA</span>
+    <span class="tagline">Financial Document Intelligence</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-icon" id="btn-upload-header" title="Upload PDF">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+    </button>
+    <button class="btn-icon" id="btn-theme" title="Toggle theme">🌙</button>
+    <div id="system-status" class="status-dot dot-checking" title="Checking system..."></div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════ MAIN ══ -->
+<main class="layout">
+
+  <!-- ─────────────────── SIDEBAR ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span>📁 Documents</span>
+      <button class="btn-sm" id="btn-upload-sidebar">+ Upload</button>
+    </div>
+
+    <div class="filter-bar">
+      <select id="filter-company">
+        <option value="">All companies</option>
+      </select>
+      <select id="filter-year">
+        <option value="">All years</option>
+      </select>
+    </div>
+
+    <div id="doc-list" class="doc-list">
+      <div class="empty-state">No documents yet.<br/>Upload a PDF to start.</div>
+    </div>
+  </aside>
+
+  <!-- ─────────────────── CHAT ─── -->
+  <section class="chat-panel">
+    <div id="chat-messages" class="chat-messages">
+      <div class="welcome-msg">
+        <h2>👋 Chào mừng đến với Hyena</h2>
+        <p>Upload báo cáo tài chính PDF và đặt câu hỏi bằng ngôn ngữ tự nhiên.</p>
+        <div class="example-queries">
+          <button class="example-btn" data-q="Biên lợi nhuận gộp thay đổi thế nào trong 3 năm qua?">Biên lợi nhuận gộp thay đổi thế nào trong 3 năm qua?</button>
+          <button class="example-btn" data-q="Doanh thu Q4 2025 là bao nhiêu?">Doanh thu Q4 2025 là bao nhiêu?</button>
+          <button class="example-btn" data-q="So sánh chi phí hoạt động giữa các năm">So sánh chi phí hoạt động giữa các năm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="chat-filters">
+        <select id="chat-company" title="Filter by company">
+          <option value="">All companies</option>
+        </select>
+        <select id="chat-year" title="Filter by year">
+          <option value="">All years</option>
+        </select>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Đặt câu hỏi về tài liệu..." rows="1"></textarea>
+        <button id="btn-send" class="btn-send" title="Send (Enter)">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="chat-hint">Enter to send · Shift+Enter for new line</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════ SOURCE VIEWER ══ -->
+<div id="source-viewer" class="source-viewer hidden">
+  <div class="source-viewer-header">
+    <span id="source-viewer-title">📎 Sources</span>
+    <button id="btn-close-sources">✕</button>
+  </div>
+  <div id="source-viewer-content" class="source-viewer-content"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ UPLOAD MODAL ══ -->
+<div id="upload-modal" class="modal hidden">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📄 Upload PDF</h3>
+      <button id="btn-close-modal">✕</button>
+    </div>
+
+    <div id="drop-zone" class="drop-zone">
+      <div class="drop-zone-inner">
+        <svg viewBox="0 0 24 24" class="drop-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>Kéo thả PDF vào đây</p>
+        <span>hoặc</span>
+        <label class="btn-primary btn-sm file-label">
+          Chọn file
+          <input type="file" id="file-input" accept=".pdf" hidden />
+        </label>
+      </div>
+    </div>
+
+    <div id="upload-form" class="upload-form hidden">
+      <div id="selected-file" class="selected-file"></div>
+      <div class="form-row">
+        <label>Công ty *</label>
+        <input type="text" id="input-company" placeholder="Vinamilk" required />
+      </div>
+      <div class="form-row">
+        <label>Năm *</label>
+        <input type="number" id="input-year" placeholder="2025" min="2000" max="2030" required />
+      </div>
+      <div class="form-row">
+        <label>Quý</label>
+        <select id="input-quarter">
+          <option value="">Cả năm</option>
+          <option value="Q1">Q1</option>
+          <option value="Q2">Q2</option>
+          <option value="Q3">Q3</option>
+          <option value="Q4">Q4</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button id="btn-cancel-upload" class="btn-secondary">Huỷ</button>
+        <button id="btn-submit-upload" class="btn-primary">🚀 Upload & Process</button>
+      </div>
+    </div>
+
+    <div id="upload-progress" class="upload-progress hidden">
+      <div class="progress-icon">⏳</div>
+      <p id="upload-status-text">Đang upload...</p>
+      <div class="progress-bar-wrap"><div id="progress-bar" class="progress-bar"></div></div>
+      <p id="upload-doc-id" class="upload-doc-id"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ TOAST ══ -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

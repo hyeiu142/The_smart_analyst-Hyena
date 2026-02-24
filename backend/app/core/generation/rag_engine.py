@@ -1,136 +1,165 @@
+from typing import Any, Dict, List, Optional
+
 from openai import OpenAI
-from typing import List, Dict, Any
 
 from backend.app.config import get_settings
-from backend.app.core.retrieval.embedder import Embedder
-from backend.app.core.retrieval.qdrant_client import QdrantClientWrapper
+from backend.app.core.retrieval.retriever import MultiCollectionRetriever
+from backend.app.core.generation.query_analyzer import QueryAnalyzer
+from backend.app.core.generation.context_builder import ContextBuilder
 
 settings = get_settings()
 
-class RAGEngine: 
-    """ 
-    RAG Engine for document retrieval and generation
+SYSTEM_PROMPT = """You are an expert financial analyst assistant.
+Answer questions based ONLY on the provided context from financial documents.
+Always cite your sources using [Source #N] format.
+If the context doesn't contain enough information, say so clearly.
+Be precise with numbers and percentages.
+Respond in the same language as the user's question."""
 
-    FLow: 
-    1. Embed query
-    2. Search Qdrant
-    3. Build context from retrieved chunks
-    4. Call LLM to generate answer
+
+class RAGEngine:
+    """
+    Agentic RAG Engine — multi-collection, with query analysis.
+
+    Flow:
+    1. QueryAnalyzer: detect intent, extract entities
+    2. MultiCollectionRetriever: search text + table + image collections
+    3. ContextBuilder: format context
+    4. LLM: synthesize answer with citations
     """
 
     def __init__(self):
         self.llm = OpenAI(api_key=settings.openai_api_key)
-        self.embedder = Embedder()
-        self.qdrant = QdrantClientWrapper()
+        self.retriever = MultiCollectionRetriever()
+        self.analyzer = QueryAnalyzer()
+        self.context_builder = ContextBuilder()
+
     async def query(
-        self, 
-        question: str, 
-        top_k: int = 5, 
-        filters: Dict = None
+        self,
+        question: str,
+        top_k: int = 5,
+        filters: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """
-        Main RAG query
-        Args: 
-            question: User question
-            top_k: Number of retrieved chunks for context
-            filters: Filters for metadata (company, year, ect.)
-                Example: {"company": "Vinamilk", "year": 2025}
-            
+        Main RAG query với multi-collection support.
+
+        Args:
+            question: Câu hỏi user
+            top_k: Tổng số chunks lấy (phân bổ: text=3, table=top_k, image=2)
+            filters: Override filters (nếu None, tự động detect từ query)
+
         Returns:
             {
-                "answer": "Doanh thu Q4 2025 là 17,045 tỷ VND...",
-                "sources": [
-                    {
-                        "content": "Revenue in Q4 2025...",
-                        "metadata": {"page": 1, "company": "Vinamilk"},
-                        "score": 0.89
-                    }
-                ]
+                "answer": "...",
+                "sources": [...],
+                "analysis": {...}  # query analysis result
             }
-
         """
+        # 1. Analyze query
+        analysis = self.analyzer.analyze(question)
+        print(f"[RAG] Intent: {analysis.get('intent')}, Types needed: {analysis.get('data_types_needed')}")
 
-        # 1. Embed query
-        query_vector = self.embedder.embed_documents(question)
+        # 2. Build filters (từ analysis nếu không có override)
+        if filters is None:
+            filters = self.analyzer.build_filters(analysis) or None
 
-        # 2. Search Qdrant
-        results = self.qdrant.search(
-            collection_name=self.qdrant.TEXT_COLLECTION,
-            query_vector=query_vector,
-            limit=top_k,
-            filters=filters
+        # 3. Multi-collection retrieval
+        chunks = self.retriever.retrieve(
+            question=question,
+            top_k_text=3,
+            top_k_table=top_k,
+            top_k_image=2,
+            filters=filters,
         )
 
-        if not results: 
+        if not chunks:
             return {
-                "answer": "Could not find relevant information",
-                "sources": []
+                "answer": "Không tìm thấy thông tin liên quan trong tài liệu.",
+                "sources": [],
+                "analysis": analysis,
             }
-        
-        # 3. Build context from retrieved chunks
-        context = self._build_context(results)
 
-        # 4. Call LLM 
+        # 4. Build context
+        context = self.context_builder.build(chunks)
+        citations = self.context_builder.build_citations(chunks)
+
+        # 5. LLM synthesis
         answer = self._synthesize(question, context)
 
         return {
-            "answer": answer, 
-            "sources": [
-                {
-                    "content": r["content"],
-                    "metadata": r["metadata"],
-                    "score": round(r["score"], 4)
-                }
-                for r in results
-            ]
+            "answer": answer,
+            "sources": citations,
+            "analysis": analysis,
         }
-    def _build_context(self, chunks: List[Dict]) -> str: 
-        """
-        Combine retrieved chunks into a context string to provide to LLM
 
-        """
-        context_parts = []
-        for i, chunk in enumerate(chunks, 1): 
-            meta = chunk.get("metadata", {})
-            company = meta.get("company", "Unknown")
-            page = meta.get("page", "Unknown")
-            page = meta.get("page", "?")
+    def _synthesize(self, question: str, context: str) -> str:
+        """Gọi LLM để generate answer từ context."""
+        user_message = f"""Context from financial documents:
+{context}
 
-            context_parts.append(f"[Source {i} - {company}, Page {page}]\n{chunk['content']}")
-        return "\n\n---\n\n".join(context_parts)
+---
+Question: {question}
 
-    def _synthesize(self, question: str, context: str) -> str: 
-        """
-        Call LLM to synthesize answer from context
-        """
-        system_prompt = """
-        You are a financial analyst assistant specializing in analyzing corporate financial reports.
+Please answer based on the context above. Cite sources using [Source #N] format."""
 
-        Your task is to answer questions based ONLY on the provided context.
-
-        Rules: 
-        - Answer in the same language as the question (Vietnamese or English)
-        - Be concise and precise with numbers
-        - Always cite source you're referring to (e.g., [Sourse 1])
-        - If the answer is not in the context, say so clearly 
-        - Do NOT make up number or facts
-        """
-
-        user_prompt = f"""Context from financial documents: {context}
-        Question: {question}
-        Answer based on the context above: 
-        """
         response = self.llm.chat.completions.create(
-            model=settings.llm_model, 
+            model=settings.llm_model,
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ], 
-            temperature=0.1, 
-            max_tokens=1024
-
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+            temperature=0.1,
+            max_tokens=1500,
         )
-
         return response.choices[0].message.content
 
+    def _build_context(self, chunks: List[Dict]) -> str:
+        """Legacy method — giữ để backward compat."""
+        return self.context_builder.build(chunks)
 
+    async def stream_query(
+        self,
+        question: str,
+        top_k: int = 5,
+        filters: Optional[Dict] = None,
+    ):
+        """
+        Streaming version — yield từng token để dùng với SSE.
+        """
+        from typing import AsyncGenerator
+
+        analysis = self.analyzer.analyze(question)
+        if filters is None:
+            filters = self.analyzer.build_filters(analysis) or None
+
+        chunks = self.retriever.retrieve(
+            question=question, top_k_text=3, top_k_table=top_k, top_k_image=2, filters=filters
+        )
+
+        if not chunks:
+            yield "Không tìm thấy thông tin liên quan trong tài liệu."
+            return
+
+        context = self.context_builder.build(chunks)
+        user_message = f"""Context from financial documents:
+{context}
+
+---
+Question: {question}
+
+Please answer based on the context above. Cite sources using [Source #N] format."""
+
+        stream = self.llm.chat.completions.create(
+            model=settings.llm_model,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+            temperature=0.1,
+            max_tokens=1500,
+            stream=True,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta

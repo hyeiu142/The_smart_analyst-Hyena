@@ -11,13 +11,16 @@ class QueryRequest(BaseModel):
     quarter: Optional[str] = None
 
 class SourceDocument(BaseModel):
-    """1 source document in result"""
-    content: str
-    metadata: Dict[str, Any]
+    """1 source citation trả về frontend — khớp với ContextBuilder.build_citations()"""
+    index: int
+    type: str          # text | table | image
+    company: str
+    page: Any          # int hoặc "?"
     score: float
+    preview: str
 
 class QueryResponse(BaseModel):
     """Response model for query endpoint"""
     answer: str
     sources: List[SourceDocument]
-    question: str 
+    question: str

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import health, documents, query
+from backend.app.api.v1 import health, documents, query
 
 api_router = APIRouter()
 
