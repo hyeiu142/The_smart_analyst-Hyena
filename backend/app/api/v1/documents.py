@@ -1,8 +1,10 @@
+import json
 import os
 import uuid
 from datetime import datetime
 from typing import List
 
+import redis
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 import aiofiles
 
@@ -18,7 +20,42 @@ router = APIRouter()
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-_doc_store: dict = {}
+# Redis-backed doc store — shared between FastAPI and Celery worker
+_redis = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+DOC_KEY = "doc:{}"
+DOCS_SET_KEY = "docs:all"
+
+
+def _get_doc(doc_id: str):
+    raw = _redis.get(DOC_KEY.format(doc_id))
+    if not raw:
+        return None
+    return json.loads(raw)
+
+
+def _save_doc(doc: dict):
+    doc_id = doc["doc_id"]
+    # Convert datetime to string for JSON
+    d = dict(doc)
+    if isinstance(d.get("created_at"), datetime):
+        d["created_at"] = d["created_at"].isoformat()
+    _redis.set(DOC_KEY.format(doc_id), json.dumps(d))
+    _redis.sadd(DOCS_SET_KEY, doc_id)
+
+
+def _delete_doc(doc_id: str):
+    _redis.delete(DOC_KEY.format(doc_id))
+    _redis.srem(DOCS_SET_KEY, doc_id)
+
+
+def _all_docs():
+    ids = _redis.smembers(DOCS_SET_KEY)
+    docs = []
+    for doc_id in ids:
+        d = _get_doc(doc_id)
+        if d:
+            docs.append(d)
+    return docs
 
 @router.post("/upload", response_model=DocumentResponse)
 async def upload_document(
@@ -47,8 +84,9 @@ async def upload_document(
         "file_path": file_path,
     }
 
-    _doc_store[doc_id] = {
-        "doc_id": doc_id, 
+    now = datetime.utcnow()
+    _save_doc({
+        "doc_id": doc_id,
         "filename": file.filename,
         "company": company,
         "year": year,
@@ -58,9 +96,9 @@ async def upload_document(
         "text_chunks": 0,
         "table_chunks": 0,
         "image_chunks": 0,
-        "created_at": datetime.utcnow(),
+        "created_at": now,
         "error": None,
-    }
+    })
 
     process_document_task.delay(doc_id, file_path, metadata)
 
@@ -71,24 +109,24 @@ async def upload_document(
         year=year,
         quarter=quarter,
         status="pending",
-        created_at=_doc_store[doc_id]["created_at"],
+        created_at=now,
         message=f"Uploaded. Processing started. Track with doc_id: {doc_id}",
     )
 
 @router.get("/", response_model=List[DocumentListItem])
 async def list_documents():
-    return [DocumentListItem(**doc) for doc in _doc_store.values()]
+    return [DocumentListItem(**doc) for doc in _all_docs()]
 
 @router.get("/{doc_id}", response_model=DocumentListItem)
 async def get_document(doc_id: str):
-    doc = _doc_store.get(doc_id)
+    doc = _get_doc(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     return DocumentListItem(**doc)
 
 @router.get("/{doc_id}/status", response_model=DocumentStatusResponse)
 async def get_document_status(doc_id: str):
-    doc = _doc_store.get(doc_id)
+    doc = _get_doc(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     return DocumentStatusResponse(
@@ -103,7 +141,7 @@ async def get_document_status(doc_id: str):
 
 @router.delete("/{doc_id}")
 async def delete_document(doc_id: str):
-    doc = _doc_store.get(doc_id)
+    doc = _get_doc(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
@@ -115,18 +153,20 @@ async def delete_document(doc_id: str):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    del _doc_store[doc_id]
+    _delete_doc(doc_id)
     return {"message": f"Document {doc_id} deleted successfully"}
 
 def update_doc_status(doc_id: str, status: str, result: dict = None, error: str = None):
-    """Call from Celery task to update document status."""
-    if doc_id not in _doc_store:
+    """Call from Celery task to update document status in Redis."""
+    doc = _get_doc(doc_id)
+    if not doc:
         return
-    _doc_store[doc_id]["status"] = status
+    doc["status"] = status
     if error:
-        _doc_store[doc_id]["error"] = error
+        doc["error"] = error
     if result:
-        _doc_store[doc_id]["total_chunks"] = result.get("total_chunks", 0)
-        _doc_store[doc_id]["text_chunks"] = result.get("text_chunks", 0)
-        _doc_store[doc_id]["table_chunks"] = result.get("table_chunks", 0)
-        _doc_store[doc_id]["image_chunks"] = result.get("image_chunks", 0)
+        doc["total_chunks"] = result.get("total_chunks", 0)
+        doc["text_chunks"] = result.get("text_chunks", 0)
+        doc["table_chunks"] = result.get("table_chunks", 0)
+        doc["image_chunks"] = result.get("image_chunks", 0)
+    _save_doc(doc)

@@ -59,8 +59,8 @@ class TableProcessor:
         documents = await self.parser.aload_data(file_path)
         chunks = []
 
-        for doc in documents:
-            page_num = doc.metadata.get("page", 1)
+        for i, doc in enumerate(documents):
+            page_num = int(doc.metadata.get("page_label", doc.metadata.get("page", i + 1)))
             tables = self._extract_tables_from_markdown(doc.text)
 
             for table_idx, table_md in enumerate(tables):
@@ -88,10 +88,16 @@ class TableProcessor:
 
     def _extract_tables_from_markdown(self, text: str) -> List[str]:
         """Tách các Markdown tables từ text."""
-        # Pattern: dòng bắt đầu bằng |, có ít nhất 2 dòng
-        pattern = r"(\|.+\|[\n\r]+(?:\|[-:| ]+\|[\n\r]+)(?:\|.+\|[\n\r]*)+)"
+        # Pattern linh hoạt hơn — chấp nhận bảng có ít nhất 2 dòng bắt đầu bằng |
+        pattern = r"((?:\|[^\n]+\|\n){2,})"
         matches = re.findall(pattern, text)
-        return [m.strip() for m in matches if m.count("\n") >= 2]
+        results = [m.strip() for m in matches if m.count("\n") >= 1]
+        # fallback: tìm block có ít nhất 1 dòng separator ---
+        if not results:
+            pattern2 = r"(\|.+\|[\n\r]+\|[-:| ]+\|[\n\r]+(?:\|.+\|[\n\r]*)*)"
+            matches2 = re.findall(pattern2, text, re.MULTILINE)
+            results = [m.strip() for m in matches2 if len(m.strip()) > 10]
+        return results
 
     def _parse_table_info(self, table_md: str):
         """Extract headers, row_count, col_count từ markdown table."""

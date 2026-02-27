@@ -40,6 +40,7 @@ class ImageProcessor:
             result_type="markdown",
             language="vi",
             verbose=False,
+            extract_images=True,
         )
         genai.configure(api_key=settings.google_api_key)
         self.vision_model = genai.GenerativeModel("gemini-2.0-flash-exp")

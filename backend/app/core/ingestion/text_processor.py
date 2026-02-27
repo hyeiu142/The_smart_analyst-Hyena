@@ -56,18 +56,21 @@ class TextProcessor:
 
         chunks = []
 
-        for doc in documents: 
+        for i, doc in enumerate(documents):
+            # LlamaParse dùng key "page_label" (string), fallback sang "page", rồi dùng index
+            page_num = int(doc.metadata.get("page_label", doc.metadata.get("page", i + 1)))
             nodes = self.splitter.get_nodes_from_documents([doc])
-            for node in nodes: 
+            for node in nodes:
                 chunk = {
-                    "id": str(uuid.uuid4()), 
-                    "content":node.text,
+                    "id": str(uuid.uuid4()),
+                    "content": node.text,
                     "metadata": {
-                        **metadata, #doc_id, company, year, quarter
-                        "page": node.metadata.get("page",1), 
+                        **metadata,  # doc_id, company, year, quarter
+                        "page": page_num,
                         "chunk_type": "text"
                     }
                 }
                 chunks.append(chunk)
         print(f"Processed {len(chunks)} text chunks")
+        return chunks
         return chunks

@@ -31,6 +31,15 @@ def process_document_task(
     from backend.app.core.ingestion.pipeline import IngestionPipeline
     from backend.app.api.v1.documents import update_doc_status
 
+    # Translate Docker path → local path if worker runs outside container
+    # Docker: /project/Docs/xxx.pdf → Local: /home/yennguyen/Hyena/Docs/xxx.pdf
+    import os
+    if not os.path.exists(file_path):
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        local_path = file_path.replace("/project/", project_root + "/")
+        if os.path.exists(local_path):
+            file_path = local_path
+
     try:
         update_doc_status(doc_id, "processing")
         print(f"[Celery] Starting ingestion for doc_id={doc_id}")
