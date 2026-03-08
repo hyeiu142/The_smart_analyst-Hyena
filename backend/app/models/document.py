@@ -4,9 +4,9 @@ from datetime import datetime
 
 
 class DocumentUploadRequest(BaseModel):
-    company: str = Field(..., example="Vinamilk")
-    year: int = Field(..., example=2025)
-    quarter: Optional[str] = Field(None, example="Q4")
+    company: str = Field(..., json_schema_extra={"example": "Vinamilk"})
+    year: int = Field(..., json_schema_extra={"example": 2025})
+    quarter: Optional[str] = Field(None, json_schema_extra={"example": "Q4"})
 
 
 class DocumentResponse(BaseModel):

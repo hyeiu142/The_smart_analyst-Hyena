@@ -19,9 +19,7 @@ class Settings(BaseSettings):
 
     debug: bool = False
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 @lru_cache 
 def get_settings() -> Settings:
