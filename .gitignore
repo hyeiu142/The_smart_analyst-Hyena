@@ -1,11 +1,39 @@
-# Python-generated files
+# Python
 __pycache__/
 *.py[oc]
+*.pyo
 build/
 dist/
 wheels/
 *.egg-info
+.eggs/
 
 # Virtual environments
-.venv
+.venv/
+venv/
+env/
+
+# Environment variables
 .env
+.env.local
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Uploads (user data - never commit)
+uploads/
+Docs/*.pdf
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Qdrant local storage (if running outside Docker)
+qdrant/storage/
