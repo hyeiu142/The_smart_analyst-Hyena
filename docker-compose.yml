@@ -29,6 +29,7 @@ services:
       - "8001:8000"
     volumes:
       - .:/project
+      - uploads_data:/project/uploads
     working_dir: /project
     env_file:
       - .env
@@ -36,7 +37,29 @@ services:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
       - REDIS_URL=redis://redis:6379/0
-      - UPLOAD_DIR=/project/Docs
+      - UPLOAD_DIR=/project/uploads
+    depends_on:
+      - qdrant
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: hyena-worker
+    command: celery -A backend.app.workers.celery_app.celery_app worker --loglevel=info
+    volumes:
+      - .:/project
+      - uploads_data:/project/uploads
+    working_dir: /project
+    env_file:
+      - .env
+    environment:
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - REDIS_URL=redis://redis:6379/0
+      - UPLOAD_DIR=/project/uploads
     depends_on:
       - qdrant
       - redis
@@ -56,5 +79,4 @@ services:
 volumes:
   qdrant_data:
   redis_data:
-
-
+  uploads_data:

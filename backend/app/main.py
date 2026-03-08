@@ -1,6 +1,9 @@
-from fastapi import FastAPI 
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
+import os
 
 from backend.app.api.v1.router import api_router
 from backend.app.config import get_settings
@@ -30,10 +33,15 @@ app.add_middleware(
 
 app.include_router(api_router, prefix="/api/v1")
 
-@app.get("/")
+@app.get("/api")
 async def root():
     return {
-        "name": "Hyena API", 
+        "name": "Hyena API",
         "version": "1.0.0",
         "status": "running"
     }
+
+# Serve frontend — must be LAST
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "frontend")
+if os.path.exists(frontend_dir):
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
