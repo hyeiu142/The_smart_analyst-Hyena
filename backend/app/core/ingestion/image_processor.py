@@ -1,4 +1,4 @@
-import base64
+import os
 import uuid
 from typing import Any, Dict, List
 
@@ -51,72 +51,95 @@ class ImageProcessor:
         metadata: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """
-        Extract images và generate captions.
+        Extract images via LlamaParse → caption with Gemini.
 
-        Returns:
-            List of image chunks với caption làm content:
-            [
-                {
-                    "id": "uuid",
-                    "content": "Bar chart showing quarterly revenue from Q1 2023 to Q4 2025...",
-                    "metadata": {
-                        "chunk_type": "image_caption",
-                        "page_num": 15,
-                        "chart_type": "bar_chart",
-                        "image_path": "uploads/doc_id_page15_img0.png"
-                    }
-                }
-            ]
+        LlamaParse flow:
+        1. aget_json() → parse result with image names/references
+        2. get_images(json_result, download_path) → download images to disk
+        3. Read each image file → send to Gemini for captioning
         """
-        # LlamaParse trả về images kèm theo documents
+        import tempfile
+
+        # Step 1: parse
         json_result = await self.parser.aget_json(file_path)
+
+        # DEBUG: inspect json_result structure
+        print(f"[ImageProcessor] json_result type={type(json_result)}, len={len(json_result) if json_result else 0}")
+        if json_result:
+            first = json_result[0]
+            print(f"[ImageProcessor] first keys={list(first.keys()) if isinstance(first, dict) else type(first)}")
+            if isinstance(first, dict):
+                has_job_id = "job_id" in first
+                has_pages = "pages" in first
+                print(f"[ImageProcessor] has job_id={has_job_id}, has pages={has_pages}")
+                if has_pages:
+                    pages = first.get("pages", [])
+                    print(f"[ImageProcessor] page count={len(pages)}")
+                    if pages:
+                        page0 = pages[0]
+                        print(f"[ImageProcessor] page[0] keys={list(page0.keys())}")
+                        print(f"[ImageProcessor] page[0] images={page0.get('images', [])}")
+
+        # Step 2: download images to a temp directory
+        doc_id = metadata.get("doc_id", "unknown")
+        download_path = os.path.join(tempfile.gettempdir(), f"hyena_images_{doc_id}")
+
+        # get_images is sync — call directly (Celery tasks run in subprocess, asyncio.to_thread unreliable)
+        images = self.parser.get_images(json_result, download_path)
+
+        print(f"[ImageProcessor] Downloaded {len(images)} images from LlamaParse")
+
         chunks = []
+        for img_data in images:
+            img_path = img_data.get("path", "")
+            page_num = img_data.get("page_number", 1)
+            print(f"[ImageProcessor] Processing image: path={img_path}, page={page_num}, exists={os.path.exists(img_path) if img_path else False}")
 
-        for page_data in json_result:
-            page_num = page_data.get("page", 1)
-            images = page_data.get("images", [])
+            if not img_path or not os.path.exists(img_path):
+                print(f"[ImageProcessor] Skipping — file not found: {img_path}")
+                continue
 
-            for img_idx, img_data in enumerate(images):
-                # img_data chứa base64 image
-                img_b64 = img_data.get("data", "")
-                if not img_b64:
-                    continue
+            # Step 3: read file bytes and send to Gemini
+            with open(img_path, "rb") as f:
+                img_bytes = f.read()
 
-                caption_data = self._caption_image(img_b64)
+            # detect mime type from extension
+            mime_type = "image/jpeg" if img_path.lower().endswith(".jpg") else "image/png"
+            caption_data = self._caption_image_bytes(img_bytes, mime_type)
+            print(f"[ImageProcessor] Caption result: {caption_data}")
 
-                # Bỏ qua ảnh không phải chart
-                if not caption_data.get("caption"):
-                    continue
+            # Skip non-chart images (logos etc.)
+            if not caption_data.get("caption"):
+                print(f"[ImageProcessor] Skipping — non_chart or caption failed")
+                continue
 
-                content = f"{caption_data['caption']}\n\nKey data: {caption_data.get('key_data', '')}"
-                img_path = f"uploads/{metadata.get('doc_id', 'unknown')}_page{page_num}_img{img_idx}.png"
+            content = f"{caption_data['caption']}\n\nKey data: {caption_data.get('key_data', '')}"
 
-                chunk = {
-                    "id": str(uuid.uuid4()),
-                    "content": content,
-                    "metadata": {
-                        **metadata,
-                        "page_num": page_num,
-                        "chunk_type": "image_caption",
-                        "chart_type": caption_data.get("chart_type", "other"),
-                        "image_path": img_path,
-                    },
-                }
-                chunks.append(chunk)
+            chunk = {
+                "id": str(uuid.uuid4()),
+                "content": content,
+                "metadata": {
+                    **metadata,
+                    "page_num": page_num,
+                    "chunk_type": "image_caption",
+                    "chart_type": caption_data.get("chart_type", "other"),
+                    "image_path": img_path,
+                },
+            }
+            chunks.append(chunk)
 
         print(f"[ImageProcessor] Captioned {len(chunks)} image chunks")
         return chunks
 
-    def _caption_image(self, image_b64: str) -> Dict:
-        """Gọi Gemini để caption ảnh."""
+    def _caption_image_bytes(self, image_bytes: bytes, mime_type: str = "image/png") -> Dict:
+        """Call Gemini to caption an image given raw bytes."""
         import json
 
         try:
-            image_bytes = base64.b64decode(image_b64)
             response = self.vision_model.generate_content(
                 [
                     CAPTION_PROMPT,
-                    {"mime_type": "image/png", "data": image_bytes},
+                    {"mime_type": mime_type, "data": image_bytes},
                 ]
             )
             text = response.text.strip()

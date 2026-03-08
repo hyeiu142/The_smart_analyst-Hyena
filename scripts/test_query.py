@@ -23,11 +23,12 @@ async def main():
 
         print(f"A: {result['answer']}")
         print(f"\nSources ({len(result['sources'])} chunks):")
-        for i, src in enumerate(result["sources"], 1):
-            meta = src["metadata"]
-            print(f"  [{i}] Score: {src['score']:.4f} | "
-                  f"Page: {meta.get('page')} | "
-                  f"Content: {src['content'][:100]}...")
+        for src in result["sources"]:
+            print(f"  [{src['index']}] {src['type'].upper()} | "
+                  f"Score: {src['score']:.4f} | "
+                  f"Company: {src['company']} | "
+                  f"Page: {src['page']} | "
+                  f"Preview: {src['preview'][:80]}...")
 
 
 if __name__ == "__main__":

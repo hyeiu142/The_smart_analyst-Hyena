@@ -58,7 +58,13 @@ class IngestionPipeline:
         print("[Pipeline] Step 1/3: Extracting content...")
         text_chunks = await self.text_processor.process(file_path, metadata)
         table_chunks = await self.table_processor.process(file_path, metadata)
-        image_chunks = await self.image_processor.process(file_path, metadata)
+        try:
+            image_chunks = await self.image_processor.process(file_path, metadata)
+        except Exception as e:
+            import traceback
+            print(f"[Pipeline] ImageProcessor FAILED: {e}")
+            print(traceback.format_exc())
+            image_chunks = []
 
         print(f"[Pipeline] Extracted: {len(text_chunks)} text, {len(table_chunks)} tables, {len(image_chunks)} images")
 
