@@ -4,6 +4,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import os
+import logging
+
+# Configure logging so RAG / Reranker logs appear in uvicorn terminal
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 from backend.app.api.v1.router import api_router
 from backend.app.config import get_settings

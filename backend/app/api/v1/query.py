@@ -86,3 +86,14 @@ async def find_similar(request: QueryRequest):
         return {"question": request.question, "results": chunks}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/cache/stats")
+async def cache_stats():
+    """Return semantic cache statistics."""
+    try:
+        stats = rag_engine.cache.stats() if rag_engine.cache else {"status": "disabled"}
+        return {"cache": stats}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

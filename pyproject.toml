@@ -12,6 +12,7 @@ dependencies = [
     "llmsherpa>=0.1.4",
     "python-dotenv>=1.2.1",
     "openai>=1.0.0",
+    "sentence-transformers>=5.2.3",
 ]
 
 [dependency-groups]
