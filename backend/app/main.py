@@ -15,6 +15,7 @@ logging.basicConfig(
 
 from backend.app.api.v1.router import api_router
 from backend.app.config import get_settings
+from backend.app.middleware.rate_limiter import RateLimiterMiddleware
 
 settings = get_settings()
 
@@ -30,6 +31,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+app.add_middleware(RateLimiterMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
