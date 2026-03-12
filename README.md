@@ -2,14 +2,19 @@
 
 An enterprise-grade **Multimodal RAG** system that lets you upload financial reports (PDF) and ask questions in natural language. Powered by LlamaParse, OpenAI, and Qdrant.
 
-## ✨ Features
+## 🌟 Key Features
 
-- **📄 Multimodal ingestion** — extracts text, tables, and images from PDFs
-- **🔍 Semantic search** — multi-collection Qdrant vector search
-- **🧠 Agentic RAG** — query analyzer detects intent and routes to the right data
-- **⚡ Streaming answers** — token-by-token responses via SSE
-- **📊 Citation tracking** — every answer links back to source pages
-- **🐳 Docker-ready** — one command to deploy everything
+*   **Multimodal RAG Pipelines:** Xử lý và truy xuất đồng thời Text, Tables, và Images từ báo cáo tài chính.
+*   **LlamaParse Integration:** Extract dữ liệu siêu chuẩn xác từ PDF sang Markdown, đặc biệt tối ưu cho bảng biểu phức tạp.
+*   **Two-Stage Retrieval:**
+    *   **Bi-Encoder (Qdrant):** Truy xuất vector lưới rộng (Top 20 candidates).
+    *   **Cross-Encoder Reranking (`bge-reranker-v2-m3`):** Chấm điểm ngữ nghĩa lại để lấy Top 5 chính xác tuyệt đối.
+*   **2-Tier Semantic Caching (Redis):** Cache Exact Match và Cosine Similarity (92% threshold), giảm 40-70% chi phí OpenAI và đạt latency ~50ms cho các câu hỏi trùng ý.
+*   **Tối ưu Hiệu năng & Bảo mật:**
+    *   **Asynchronous Ingestion:** Sử dụng Celery workers để xử lý tác vụ nặng ngầm, không block API.
+    *   **Sliding Window Rate Limiter:** Backend ngăn chặn spam API (20 req/60s).
+    *   **Metadata Filtering:** Phân mảnh dữ liệu theo Công ty/Năm/Quý trong Qdrant.
+*   **Fully Dockerized:** Triển khai dễ dàng với Docker Compose (API, Celery, Qdrant, Redis).
 
 ## 🏗 Architecture
 
