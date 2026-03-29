@@ -1,7 +1,10 @@
 [project]
-name = "hyena"
+name = "Hyena-enterprise-rag"
 version = "0.1.0"
-description = "Add your description here"
+description = "Enterprise Multimodal RAG System enabling high-fidelity natural language search (Hệ thống RAG Đa phương thức xử lý báo cáo tài chính bằng AI)."
+authors = [
+    { name = "Yen Nguyen", email = "hyennguyen140205@gmail.com" }
+]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
