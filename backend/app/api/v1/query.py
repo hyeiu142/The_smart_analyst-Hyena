@@ -46,6 +46,7 @@ async def query_stream(request: QueryRequest):
     Streaming RAG response (Server-Sent Events).
     Frontend nhận từng token như ChatGPT.
     """
+    print(f"\n🔥🔥🔥 ĐÃ NHẬN ĐƯỢC CÂU HỎI: '{request.question}' TỪ FRONTEND!\n")
     async def event_generator():
         try:
             filters = {}

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 
@@ -110,7 +111,8 @@ class RAGEngine:
             }
 
         # 4. Rerank: cross-encoder picks the best top_k from the wide set
-        chunks = self.reranker.rerank(question, chunks, top_n=top_k)
+        # Run in thread to avoid blocking the async event loop (model.predict is CPU-bound)
+        chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
         logger.info(f"[RAG] After rerank: {len(chunks)} chunks")
 
         # 5. Build context
@@ -186,8 +188,8 @@ Please answer based on the context above. Cite sources using [Source #N] format.
             yield "Không tìm thấy thông tin liên quan trong tài liệu."
             return
 
-        # Rerank
-        chunks = self.reranker.rerank(question, chunks, top_n=top_k)
+        # Rerank (run in thread to avoid blocking event loop)
+        chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
 
         context = self.context_builder.build(chunks)
         user_message = f"""Context from financial documents:

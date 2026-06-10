@@ -37,3 +37,4 @@ Thumbs.db
 
 # Qdrant local storage (if running outside Docker)
 qdrant/storage/
+Hyena-Learning/
