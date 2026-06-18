@@ -1,7 +1,10 @@
 import os
+import re
 import uuid
+import mimetypes
 from typing import Any, Dict, List
 
+import httpx
 from openai import OpenAI
 from llama_parse import LlamaParse
 
@@ -60,8 +63,6 @@ class ImageProcessor:
         2. get_images(json_result, download_path) → download images to disk
         3. Read each image file → send to Gemini for captioning
         """
-        import tempfile
-
         # Step 1: parse
         json_result = await self.parser.aget_json(file_path)
 
@@ -83,22 +84,28 @@ class ImageProcessor:
                         print(f"[ImageProcessor] page[0] images={page0.get('images', [])}")
 
         doc_id = metadata.get("doc_id", "unknown")
-        upload_dir = getattr(settings, 'UPLOAD_DIR', 'uploads')
+        upload_dir = settings.upload_dir
         download_path = os.path.join(upload_dir, 'images', doc_id)
         os.makedirs(download_path, exist_ok=True)
 
-        images = self.parser.get_images(json_result, download_path)
+        images = self._download_images_from_json(json_result, download_path)
+        if not images:
+            images = self._collect_local_images(download_path)
 
-        print(f"[ImageProcessor] Downloaded {len(images)} images from LlamaParse")
+        print(f"[ImageProcessor] Found {len(images)} images from LlamaParse")
 
         chunks = []
         for img_data in images:
             img_path = img_data.get("path", "")
-            page_num = img_data.get("page_number", 1)
+            page_num = self._infer_page_number(img_data)
             print(f"[ImageProcessor] Processing image: path={img_path}, page={page_num}, exists={os.path.exists(img_path) if img_path else False}")
 
             if not img_path or not os.path.exists(img_path):
-                print(f"[ImageProcessor] Skipping — file not found: {img_path}")
+                print(f"[ImageProcessor] Skipping - file not found: {img_path}")
+                continue
+
+            if not self._is_valid_image_file(img_path):
+                print(f"[ImageProcessor] Skipping - invalid image file: {img_path}")
                 continue
 
             file_size_kb = os.path.getsize(img_path) / 1024
@@ -113,13 +120,13 @@ class ImageProcessor:
                 img_bytes = f.read()
 
             # detect mime type from extension
-            mime_type = "image/jpeg" if img_path.lower().endswith(".jpg") else "image/png"
+            mime_type = mimetypes.guess_type(img_path)[0] or "image/png"
             caption_data = self._caption_image_bytes(img_bytes, mime_type)
             print(f"[ImageProcessor] Caption result: {caption_data}")
 
             # Skip non-chart images (logos etc.)
             if not caption_data.get("caption"):
-                print(f"[ImageProcessor] Skipping — non_chart or caption failed")
+                print(f"[ImageProcessor] Skipping - non_chart or caption failed")
                 continue
 
             content = f"{caption_data['caption']}\n\nKey data: {caption_data.get('key_data', '')}"
@@ -139,6 +146,109 @@ class ImageProcessor:
 
         print(f"[ImageProcessor] Captioned {len(chunks)} image chunks")
         return chunks
+
+    def _download_images_from_json(self, json_result: List[dict], download_path: str) -> List[Dict[str, Any]]:
+        """Download LlamaParse image artifacts with HTTP/file validation."""
+        if not json_result:
+            return []
+
+        headers = {"Authorization": f"Bearer {settings.llama_cloud_api_key}"}
+        images: List[Dict[str, Any]] = []
+
+        with httpx.Client(timeout=60.0) as client:
+            for result in json_result:
+                job_id = result.get("job_id")
+                pages = result.get("pages") or []
+                if not job_id:
+                    print("[ImageProcessor] Skipping result without job_id")
+                    continue
+
+                for page in pages:
+                    page_number = page.get("page", page.get("page_number", 1))
+                    for image in page.get("images") or []:
+                        image_name = image.get("name") or image.get("image_name")
+                        if not image_name:
+                            continue
+
+                        filename = f"{job_id}-{image_name}"
+                        if not filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                            filename += ".png"
+
+                        image_path = os.path.join(download_path, filename)
+                        image_url = f"{self.parser.base_url}/api/parsing/job/{job_id}/result/image/{image_name}"
+
+                        try:
+                            response = client.get(image_url, headers=headers)
+                            response.raise_for_status()
+                        except Exception as exc:
+                            print(f"[ImageProcessor] Download failed for {image_name}: {exc}")
+                            continue
+
+                        content_type = response.headers.get("content-type", "")
+                        if "image" not in content_type and not self._looks_like_image(response.content):
+                            print(f"[ImageProcessor] Download skipped - non-image response for {image_name}: {content_type}")
+                            continue
+
+                        with open(image_path, "wb") as f:
+                            f.write(response.content)
+
+                        images.append({
+                            **image,
+                            "path": image_path,
+                            "job_id": job_id,
+                            "page_number": page_number,
+                            "original_pdf_path": result.get("file_path"),
+                        })
+
+        return images
+
+    def _collect_local_images(self, download_path: str) -> List[Dict[str, Any]]:
+        """Fallback for reruns: reuse valid images already present on disk."""
+        if not os.path.isdir(download_path):
+            return []
+
+        images = []
+        for filename in sorted(os.listdir(download_path)):
+            if not filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                continue
+            path = os.path.join(download_path, filename)
+            if self._is_valid_image_file(path):
+                images.append({"path": path, "page_number": self._infer_page_number({"path": path})})
+
+        if images:
+            print(f"[ImageProcessor] Reusing {len(images)} local images from {download_path}")
+        return images
+
+    def _infer_page_number(self, image_data: Dict[str, Any]) -> int:
+        explicit = image_data.get("page_number") or image_data.get("page")
+        if explicit:
+            try:
+                return int(explicit)
+            except (TypeError, ValueError):
+                pass
+
+        path = image_data.get("path", "")
+        filename = os.path.basename(path)
+        match = re.search(r"(?:page_|img_p)(\d+)", filename)
+        if not match:
+            return 1
+
+        page = int(match.group(1))
+        return page + 1 if "img_p" in filename else page
+
+    def _is_valid_image_file(self, image_path: str) -> bool:
+        try:
+            with open(image_path, "rb") as f:
+                return self._looks_like_image(f.read(16))
+        except OSError:
+            return False
+
+    def _looks_like_image(self, data: bytes) -> bool:
+        return (
+            data.startswith(b"\x89PNG\r\n\x1a\n")
+            or data.startswith(b"\xff\xd8\xff")
+            or data.startswith(b"RIFF") and data[8:12] == b"WEBP"
+        )
 
     def _caption_image_bytes(self, image_bytes: bytes, mime_type: str = "image/png") -> Dict:
         """Call OpenAI gpt-4o-mini to caption an image given raw bytes."""
@@ -173,6 +283,10 @@ class ImageProcessor:
                 text = text.split("```")[1]
                 if text.startswith("json"):
                     text = text[4:]
+            else:
+                match = re.search(r"\{.*\}", text, re.DOTALL)
+                if match:
+                    text = match.group(0)
             return json.loads(text)
         except Exception as e:
             print(f"[ImageProcessor] Caption failed: {e}")
