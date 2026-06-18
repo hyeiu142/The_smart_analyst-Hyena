@@ -2,7 +2,7 @@ import os
 import uuid
 from typing import Any, Dict, List
 
-import google.generativeai as genai
+from openai import OpenAI
 from llama_parse import LlamaParse
 
 from backend.app.config import get_settings
@@ -10,22 +10,25 @@ from backend.app.config import get_settings
 settings = get_settings()
 
 CAPTION_PROMPT = """
-You are analyzing a chart/image from a financial report.
-Please provide:
-1. A concise caption (1-2 sentences) describing what this chart shows
-2. Key data points visible in the chart (numbers, trends, percentages)
-3. Chart type (bar_chart, line_chart, pie_chart, table_image, diagram, other)
+You are acting as an expert financial data analyst. You are analyzing a chart, graph, or image from a financial report.
+Please extract the maximum amount of detail possible to ensure accurate semantic search later.
 
-Respond in this JSON format:
+Provide the following:
+1. "caption": A highly detailed paragraph (not just 1-2 sentences) describing exactly what the chart illustrates. Include the axes, units, timeframes, and the overall context (e.g., "This dual-axis chart illustrates the ICT Revenue in billions USD alongside the YoY growth percentage from 2018 to 2025E...").
+2. "key_data": Extract ALL visible data points, numbers, and categories into a well-formatted Markdown Table. After the table, list 2-3 key analytical insights (peaks, major drops, notable trends).
+3. "chart_type": (bar_chart, line_chart, pie_chart, table_image, diagram, other).
+
+Respond EXACTLY in this JSON format:
 {
-    "caption": "Bar chart showing quarterly revenue...",
-    "key_data": "Q1 2023: 14,500B VND, Q4 2025: 17,045B VND. Trend: consistent growth",
+    "caption": "Detailed description here...",
+    "key_data": "Markdown table here... \n\nInsights: ...",
     "chart_type": "bar_chart"
 }
 
-If this is not a chart/graph (e.g. logo, signature, photo), respond:
+If this is completely NOT a chart/graph/data table (e.g. company logo, decorative photo, signature), respond:
 {"caption": null, "key_data": null, "chart_type": "non_chart"}
 """
+
 
 
 class ImageProcessor:
@@ -42,8 +45,7 @@ class ImageProcessor:
             verbose=False,
             extract_images=True,
         )
-        genai.configure(api_key=settings.google_api_key)
-        self.vision_model = genai.GenerativeModel("gemini-2.0-flash-exp")
+        self.openai_client = OpenAI(api_key=settings.openai_api_key)
 
     async def process(
         self,
@@ -80,11 +82,11 @@ class ImageProcessor:
                         print(f"[ImageProcessor] page[0] keys={list(page0.keys())}")
                         print(f"[ImageProcessor] page[0] images={page0.get('images', [])}")
 
-        # Step 2: download images to a temp directory
         doc_id = metadata.get("doc_id", "unknown")
-        download_path = os.path.join(tempfile.gettempdir(), f"hyena_images_{doc_id}")
+        upload_dir = getattr(settings, 'UPLOAD_DIR', 'uploads')
+        download_path = os.path.join(upload_dir, 'images', doc_id)
+        os.makedirs(download_path, exist_ok=True)
 
-        # get_images is sync — call directly (Celery tasks run in subprocess, asyncio.to_thread unreliable)
         images = self.parser.get_images(json_result, download_path)
 
         print(f"[ImageProcessor] Downloaded {len(images)} images from LlamaParse")
@@ -99,7 +101,14 @@ class ImageProcessor:
                 print(f"[ImageProcessor] Skipping — file not found: {img_path}")
                 continue
 
-            # Step 3: read file bytes and send to Gemini
+            file_size_kb = os.path.getsize(img_path) / 1024
+            if file_size_kb < 15: 
+                print(f"[ImageProcessor] Skipping tiny image ({file_size_kb:.1f}KB): {img_path}")
+                os.remove(img_path)
+                continue
+
+            relative_image_url = f"/uploads/images/{doc_id}/{os.path.basename(img_path)}"
+            
             with open(img_path, "rb") as f:
                 img_bytes = f.read()
 
@@ -123,7 +132,7 @@ class ImageProcessor:
                     "page_num": page_num,
                     "chunk_type": "image_caption",
                     "chart_type": caption_data.get("chart_type", "other"),
-                    "image_path": img_path,
+                    "image_path": relative_image_url,
                 },
             }
             chunks.append(chunk)
@@ -132,17 +141,33 @@ class ImageProcessor:
         return chunks
 
     def _caption_image_bytes(self, image_bytes: bytes, mime_type: str = "image/png") -> Dict:
-        """Call Gemini to caption an image given raw bytes."""
+        """Call OpenAI gpt-4o-mini to caption an image given raw bytes."""
         import json
+        import base64
 
         try:
-            response = self.vision_model.generate_content(
-                [
-                    CAPTION_PROMPT,
-                    {"mime_type": mime_type, "data": image_bytes},
-                ]
+            base64_image = base64.b64encode(image_bytes).decode('utf-8')
+            
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": CAPTION_PROMPT},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:{mime_type};base64,{base64_image}"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=800
             )
-            text = response.text.strip()
+            
+            text = response.choices[0].message.content.strip()
             # Bỏ markdown code block nếu có
             if text.startswith("```"):
                 text = text.split("```")[1]
