@@ -22,7 +22,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "doclayout-yolo>=0.0.4",
     "httpx>=0.28.1",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
+    "ultralytics>=8.4.71",
 ]
