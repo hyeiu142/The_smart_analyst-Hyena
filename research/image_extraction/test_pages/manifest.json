@@ -1,0 +1,65 @@
+[
+  {
+    "page": 1,
+    "image_path": "research/image_extraction/test_pages/page_1.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  },
+  {
+    "page": 2,
+    "image_path": "research/image_extraction/test_pages/page_2.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  },
+  {
+    "page": 3,
+    "image_path": "research/image_extraction/test_pages/page_3.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  },
+  {
+    "page": 4,
+    "image_path": "research/image_extraction/test_pages/page_4.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  },
+  {
+    "page": 5,
+    "image_path": "research/image_extraction/test_pages/page_5.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  },
+  {
+    "page": 6,
+    "image_path": "research/image_extraction/test_pages/page_6.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  },
+  {
+    "page": 7,
+    "image_path": "research/image_extraction/test_pages/page_7.png",
+    "pdf_width": 595.5,
+    "pdf_height": 842.25,
+    "image_width": 1324,
+    "image_height": 1872,
+    "dpi": 160
+  }
+]
