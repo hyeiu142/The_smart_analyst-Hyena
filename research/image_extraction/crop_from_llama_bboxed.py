@@ -1,53 +1,152 @@
 #!/usr/bin/env python3
+"""
+Crop chart/image regions from rendered PDF pages using LlamaParse bboxes.
+
+Responsibility:
+    Pillow crops final images. This script does not call LlamaParse and does not
+    render PDF pages.
+"""
+
 import argparse
 import json
+import re
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from PIL import Image
 
 
-SKIP_TYPES = {"full_page_screenshot", "page_screenshot"}
+SKIP_TYPES = {
+    "full_page_screenshot",
+    "page_screenshot",
+    "screenshot",
+}
+
+ITEM_LIST_KEYS = (
+    "charts",
+    "images",
+    "figures",
+    "items",
+    "layout",
+    "blocks",
+)
+
+
+@dataclass(frozen=True)
+class CropCandidate:
+    page: int
+    index: int
+    item_type: str
+    bbox: tuple[float, float, float, float]
+    raw: dict[str, Any]
 
 
 def find_pages(data: dict[str, Any]) -> list[dict[str, Any]]:
     if isinstance(data.get("pages"), list):
         return data["pages"]
 
-    if isinstance(data.get("documents"), list):
-        for document in data["documents"]:
+    documents = data.get("documents")
+    if isinstance(documents, list):
+        pages: list[dict[str, Any]] = []
+        for document in documents:
             if isinstance(document, dict) and isinstance(document.get("pages"), list):
-                return document["pages"]
+                pages.extend(document["pages"])
+        return pages
 
     return []
 
 
 def page_number(page: dict[str, Any], fallback: int) -> int:
-    for key in ("page", "page_number", "page_num"):
+    for key in ("page", "page_number", "page_num", "page_index"):
         value = page.get(key)
         if isinstance(value, int):
-            return value
+            return value + 1 if key == "page_index" else value
+        if isinstance(value, str) and value.isdigit():
+            return int(value)
     return fallback
 
 
-def collect_items(page: dict[str, Any]) -> list[dict[str, Any]]:
-    items = []
-    for key in ("images", "charts", "figures"):
+def page_size(page: dict[str, Any]) -> tuple[float, float] | None:
+    width = page.get("width") or page.get("page_width")
+    height = page.get("height") or page.get("page_height")
+
+    if width and height:
+        return float(width), float(height)
+
+    bbox = read_bbox(page)
+    if bbox:
+        _, _, bbox_width, bbox_height = bbox
+        if bbox_width > 0 and bbox_height > 0:
+            return bbox_width, bbox_height
+
+    return None
+
+
+def iter_dict_items(value: Any) -> Iterable[dict[str, Any]]:
+    if isinstance(value, dict):
+        yield value
+        for key in ITEM_LIST_KEYS:
+            nested = value.get(key)
+            if isinstance(nested, list):
+                for item in nested:
+                    yield from iter_dict_items(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from iter_dict_items(item)
+
+
+def collect_page_items(page: dict[str, Any]) -> list[dict[str, Any]]:
+    seen: set[int] = set()
+    items: list[dict[str, Any]] = []
+
+    for key in ITEM_LIST_KEYS:
         value = page.get(key)
-        if isinstance(value, list):
-            items.extend(item for item in value if isinstance(item, dict))
+        if not isinstance(value, list):
+            continue
+
+        for item in iter_dict_items(value):
+            marker = id(item)
+            if marker not in seen:
+                seen.add(marker)
+                items.append(item)
+
     return items
 
 
 def read_bbox(item: dict[str, Any]) -> tuple[float, float, float, float] | None:
     if all(key in item for key in ("x", "y", "width", "height")):
-        return float(item["x"]), float(item["y"]), float(item["width"]), float(item["height"])
+        return (
+            float(item["x"]),
+            float(item["y"]),
+            float(item["width"]),
+            float(item["height"]),
+        )
 
-    bbox = item.get("bbox") or item.get("bounding_box")
+    bbox = (
+        item.get("bbox")
+        or item.get("bounding_box")
+        or item.get("bounds")
+        or item.get("box")
+    )
 
     if isinstance(bbox, dict):
         if all(key in bbox for key in ("x", "y", "width", "height")):
-            return float(bbox["x"]), float(bbox["y"]), float(bbox["width"]), float(bbox["height"])
+            return (
+                float(bbox["x"]),
+                float(bbox["y"]),
+                float(bbox["width"]),
+                float(bbox["height"]),
+            )
+
+        if all(key in bbox for key in ("left", "top", "width", "height")):
+            return (
+                float(bbox["left"]),
+                float(bbox["top"]),
+                float(bbox["width"]),
+                float(bbox["height"]),
+            )
+
         if all(key in bbox for key in ("x1", "y1", "x2", "y2")):
             x1 = float(bbox["x1"])
             y1 = float(bbox["y1"])
@@ -60,6 +159,34 @@ def read_bbox(item: dict[str, Any]) -> tuple[float, float, float, float] | None:
         return x1, y1, x2 - x1, y2 - y1
 
     return None
+
+
+def item_type(item: dict[str, Any]) -> str:
+    value = item.get("type") or item.get("category") or item.get("label") or "image"
+    normalized = re.sub(r"[^a-zA-Z0-9_-]+", "_", str(value).strip().lower())
+    return normalized.strip("_") or "image"
+
+
+def build_candidates(page: dict[str, Any], fallback_page_num: int) -> list[CropCandidate]:
+    num = page_number(page, fallback_page_num)
+    candidates: list[CropCandidate] = []
+
+    for item in collect_page_items(page):
+        bbox = read_bbox(item)
+        if not bbox:
+            continue
+
+        candidates.append(
+            CropCandidate(
+                page=num,
+                index=len(candidates) + 1,
+                item_type=item_type(item),
+                bbox=bbox,
+                raw=item,
+            )
+        )
+
+    return candidates
 
 
 def scale_bbox(
@@ -89,8 +216,9 @@ def add_padding(
     padding_y_ratio: float,
 ) -> tuple[int, int, int, int]:
     x1, y1, x2, y2 = box
-    crop_width = x2 - x1
-    crop_height = y2 - y1
+    crop_width = max(0, x2 - x1)
+    crop_height = max(0, y2 - y1)
+
     padding_x = round(crop_width * padding_x_ratio)
     padding_y = round(crop_height * padding_y_ratio)
 
@@ -103,7 +231,7 @@ def add_padding(
 
 
 def should_skip(
-    item: dict[str, Any],
+    candidate: CropCandidate,
     box: tuple[int, int, int, int],
     image_width: int,
     image_height: int,
@@ -111,31 +239,37 @@ def should_skip(
     min_height: int,
     max_area_ratio: float,
 ) -> bool:
-    item_type = str(item.get("type", "")).lower()
-    if item_type in SKIP_TYPES:
+    if candidate.item_type in SKIP_TYPES:
         return True
 
     x1, y1, x2, y2 = box
     crop_width = x2 - x1
     crop_height = y2 - y1
 
+    if crop_width <= 0 or crop_height <= 0:
+        return True
+
     if crop_width < min_width or crop_height < min_height:
         return True
 
-    area_ratio = (crop_width * crop_height) / (image_width * image_height)
-    return area_ratio >= max_area_ratio
+    page_area = image_width * image_height
+    crop_area = crop_width * crop_height
+    if page_area <= 0:
+        return True
+
+    return (crop_area / page_area) >= max_area_ratio
 
 
 def crop_from_llama_bboxes(
     llama_json_path: Path,
     pages_dir: Path,
     out_dir: Path,
-    page_template: str,
-    padding_x_ratio: float,
-    padding_y_ratio: float,
-    min_width: int,
-    min_height: int,
-    max_area_ratio: float,
+    page_template: str = "page_{page}.png",
+    padding_x_ratio: float = 0.03,
+    padding_y_ratio: float = 0.04,
+    min_width: int = 120,
+    min_height: int = 80,
+    max_area_ratio: float = 0.92,
 ) -> int:
     data = json.loads(llama_json_path.read_text(encoding="utf-8"))
     pages = find_pages(data)
@@ -146,52 +280,65 @@ def crop_from_llama_bboxes(
     out_dir.mkdir(parents=True, exist_ok=True)
     saved_count = 0
 
-    for index, page in enumerate(pages, start=1):
-        num = page_number(page, index)
-        page_image_path = pages_dir / page_template.format(page=num, page_num=num)
+    for fallback_page_num, page in enumerate(pages, start=1):
+        num = page_number(page, fallback_page_num)
+        size = page_size(page)
+        if not size:
+            print(f"Skip page {num}: missing page width/height in JSON")
+            continue
 
+        page_width, page_height = size
+        page_image_path = pages_dir / page_template.format(page=num, page_num=num)
         if not page_image_path.exists():
             print(f"Skip page {num}: missing image {page_image_path}")
             continue
 
-        page_width = float(page.get("width") or page.get("page_width") or 0)
-        page_height = float(page.get("height") or page.get("page_height") or 0)
-        if page_width <= 0 or page_height <= 0:
-            print(f"Skip page {num}: missing page width/height in JSON")
-            continue
+        with Image.open(page_image_path) as image:
+            image_width, image_height = image.size
 
-        image = Image.open(page_image_path)
-        image_width, image_height = image.size
+            for candidate in build_candidates(page, num):
+                pixel_box = scale_bbox(
+                    bbox=candidate.bbox,
+                    page_width=page_width,
+                    page_height=page_height,
+                    image_width=image_width,
+                    image_height=image_height,
+                )
+                padded_box = add_padding(
+                    box=pixel_box,
+                    image_width=image_width,
+                    image_height=image_height,
+                    padding_x_ratio=padding_x_ratio,
+                    padding_y_ratio=padding_y_ratio,
+                )
 
-        for item_index, item in enumerate(collect_items(page), start=1):
-            bbox = read_bbox(item)
-            if bbox is None:
-                continue
+                if should_skip(
+                    candidate=candidate,
+                    box=padded_box,
+                    image_width=image_width,
+                    image_height=image_height,
+                    min_width=min_width,
+                    min_height=min_height,
+                    max_area_ratio=max_area_ratio,
+                ):
+                    continue
 
-            pixel_box = scale_bbox(bbox, page_width, page_height, image_width, image_height)
-            padded_box = add_padding(pixel_box, image_width, image_height, padding_x_ratio, padding_y_ratio)
-
-            if should_skip(item, padded_box, image_width, image_height, min_width, min_height, max_area_ratio):
-                continue
-
-            item_type = str(item.get("type") or "image").lower().replace(" ", "_")
-            out_path = out_dir / f"page_{num}_{item_index:02d}_{item_type}.png"
-            image.crop(padded_box).save(out_path)
-
-            saved_count += 1
-            print(f"Saved {out_path}")
+                out_path = out_dir / f"page_{num}_{candidate.index:02d}_{candidate.item_type}.png"
+                image.crop(padded_box).save(out_path)
+                saved_count += 1
+                print(f"Saved {out_path}")
 
     return saved_count
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Crop charts/images from rendered pages using LlamaParse bboxes.")
-    parser.add_argument("llama_json", type=Path)
+    parser.add_argument("llama_json", type=Path, help="LlamaParse JSON path.")
     parser.add_argument("--pages-dir", type=Path, default=Path("pages"))
     parser.add_argument("--out-dir", type=Path, default=Path("outputs"))
     parser.add_argument("--page-template", default="page_{page}.png")
-    parser.add_argument("--padding-x", type=float, default=0.15)
-    parser.add_argument("--padding-y", type=float, default=0.25)
+    parser.add_argument("--padding-x", type=float, default=0.03)
+    parser.add_argument("--padding-y", type=float, default=0.04)
     parser.add_argument("--min-width", type=int, default=120)
     parser.add_argument("--min-height", type=int, default=80)
     parser.add_argument("--max-area-ratio", type=float, default=0.92)
