@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     chunk_overlap: int = 200
     upload_dir: str = "uploads"
 
+    doclayout_model_path: str = "research/image_extraction/data/models/doclayout_yolo_docstructbench_imgsz1024.pt"
+    doclayout_device: str = "cpu"
+    doclayout_conf: float = 0.20
+    doclayout_dpi: int = 160
+    doclayout_imgsz: int = 1024
+
     debug: bool = False
 
     @field_validator("debug", mode="before")
@@ -26,7 +32,7 @@ class Settings(BaseSettings):
     def parse_debug(cls, value):
         if isinstance(value, str):
             normalized = value.strip().lower()
-            if normalized in {"release", "prod", "production", "false", "0", "no", "off"}:
+            if normalized in {"release", "prod", "production", "false", "0", "no", "off", "warn", "warning", "info", "error"}:
                 return False
             if normalized in {"debug", "dev", "development", "true", "1", "yes", "on"}:
                 return True
