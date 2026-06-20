@@ -1,0 +1,3500 @@
+{
+  "created_at": "2026-06-20T23:41:40",
+  "summary": {
+    "total": 20,
+    "passed": 13,
+    "failed": 7,
+    "pass_rate": 0.65,
+    "by_category": {
+      "text": {
+        "total": 5,
+        "passed": 5,
+        "pass_rate": 1.0
+      },
+      "table": {
+        "total": 5,
+        "passed": 3,
+        "pass_rate": 0.6
+      },
+      "image": {
+        "total": 5,
+        "passed": 1,
+        "pass_rate": 0.2
+      },
+      "mixed": {
+        "total": 5,
+        "passed": 4,
+        "pass_rate": 0.8
+      }
+    },
+    "check_rates": {
+      "page_hit": 0.8,
+      "type_hit": 1.0,
+      "number_hit": 0.85,
+      "image_hint_hit": 0.8
+    }
+  },
+  "results": [
+    {
+      "id": "fpt_001",
+      "category": "text",
+      "question": "Mảng công nghệ chiếm bao nhiêu phần trăm doanh thu và lợi nhuận của FPT năm 2025?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          1
+        ],
+        "chunk_types": [
+          "text"
+        ],
+        "numbers": [
+          "63%",
+          "45%"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 1
+          },
+          {
+            "rank": 2,
+            "page": 1
+          },
+          {
+            "rank": 3,
+            "page": 1
+          },
+          {
+            "rank": 5,
+            "page": 1
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "63%"
+          },
+          {
+            "rank": 1,
+            "number": "45%"
+          },
+          {
+            "rank": 2,
+            "number": "63%"
+          },
+          {
+            "rank": 2,
+            "number": "45%"
+          },
+          {
+            "rank": 3,
+            "number": "63%"
+          },
+          {
+            "rank": 3,
+            "number": "45%"
+          },
+          {
+            "rank": 6,
+            "number": "63%"
+          },
+          {
+            "rank": 6,
+            "number": "45%"
+          },
+          {
+            "rank": 7,
+            "number": "63%"
+          },
+          {
+            "rank": 7,
+            "number": "45%"
+          },
+          {
+            "rank": 8,
+            "number": "63%"
+          },
+          {
+            "rank": 8,
+            "number": "45%"
+          },
+          {
+            "rank": 9,
+            "number": "63%"
+          },
+          {
+            "rank": 9,
+            "number": "45%"
+          },
+          {
+            "rank": 10,
+            "number": "63%"
+          },
+          {
+            "rank": 10,
+            "number": "45%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.8035308,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.7973944,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.79737365,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.70943016,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-faceted financial report presents several charts and diagrams that highlight the projected revenue and profit targets for the company fpt from 2023 to 2025. the first chart, a dual-axis bar graph, illustrates fpt's revenue in trillion vnd "
+        },
+        {
+          "rank": 5,
+          "score": 0.7070874,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 6,
+          "score": 0.68431294,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.68431294,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.68431294,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.6822791,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 10,
+          "score": 0.6822791,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        }
+      ]
+    },
+    {
+      "id": "fpt_002",
+      "category": "text",
+      "question": "Chi tiêu CNTT toàn cầu năm 2025 dự báo đạt bao nhiêu nghìn tỷ USD theo báo cáo của IDC?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          2
+        ],
+        "chunk_types": [
+          "text"
+        ],
+        "numbers": [
+          "4,25"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 2
+          },
+          {
+            "rank": 2,
+            "page": 2
+          },
+          {
+            "rank": 3,
+            "page": 2
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "4,25"
+          },
+          {
+            "rank": 2,
+            "number": "4,25"
+          },
+          {
+            "rank": 3,
+            "number": "4,25"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.6957424,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 2,
+          "preview": "báo cáo phân tích doanh nghiệp # 1. thị trường cntt chi tiêu cntt toàn cầu năm 2025 dự báo đạt 4,25 nghìn tỷ usd. chi tiêu cho lĩnh vực cntt năm 2025 dự báo sẽ đạt mức tăng trưởng 14% theo idc, cao nhất kể từ năm 1996 khi windows 95 ra rời mở ra giai"
+        },
+        {
+          "rank": 2,
+          "score": 0.69360256,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 2,
+          "preview": "báo cáo phân tích doanh nghiệp # 1. thị trường cntt chi tiêu cntt toàn cầu năm 2025 dự báo đạt 4,25 nghìn tỷ usd. chi tiêu cho lĩnh vực cntt năm 2025 dự báo sẽ đạt mức tăng trưởng 14% theo idc, cao nhất kể từ năm 1996 khi windows 95 ra rời mở ra giai"
+        },
+        {
+          "rank": 3,
+          "score": 0.6935446,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 2,
+          "preview": "báo cáo phân tích doanh nghiệp # 1. thị trường cntt chi tiêu cntt toàn cầu năm 2025 dự báo đạt 4,25 nghìn tỷ usd. chi tiêu cho lĩnh vực cntt năm 2025 dự báo sẽ đạt mức tăng trưởng 14% theo idc, cao nhất kể từ năm 1996 khi windows 95 ra rời mở ra giai"
+        },
+        {
+          "rank": 4,
+          "score": 0.5217564,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 5,
+          "score": 0.5217564,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 6,
+          "score": 0.5217564,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 7,
+          "score": 0.5215711,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 8,
+          "score": 0.5215711,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 9,
+          "score": 0.51909024,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 10,
+          "score": 0.47367054,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        }
+      ]
+    },
+    {
+      "id": "fpt_003",
+      "category": "text",
+      "question": "Số lượng hợp đồng ký mới có giá trị trên 10 triệu USD của FPT trong năm 2025 là bao nhiêu hợp đồng?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          3
+        ],
+        "chunk_types": [
+          "text"
+        ],
+        "numbers": [
+          "26"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 6,
+            "page": 3
+          },
+          {
+            "rank": 7,
+            "page": 3
+          },
+          {
+            "rank": 8,
+            "page": 3
+          },
+          {
+            "rank": 9,
+            "page": 3
+          },
+          {
+            "rank": 10,
+            "page": 3
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "26"
+          },
+          {
+            "rank": 2,
+            "number": "26"
+          },
+          {
+            "rank": 3,
+            "number": "26"
+          },
+          {
+            "rank": 6,
+            "number": "26"
+          },
+          {
+            "rank": 7,
+            "number": "26"
+          },
+          {
+            "rank": 8,
+            "number": "26"
+          },
+          {
+            "rank": 9,
+            "number": "26"
+          },
+          {
+            "rank": 10,
+            "number": "26"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.69620717,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.69619524,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.68877566,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.61985874,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.6004312,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-faceted financial report presents several charts and diagrams that highlight the projected revenue and profit targets for the company fpt from 2023 to 2025. the first chart, a dual-axis bar graph, illustrates fpt's revenue in trillion vnd "
+        },
+        {
+          "rank": 6,
+          "score": 0.5551574,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 7,
+          "score": 0.5551574,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 8,
+          "score": 0.55005825,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.55005825,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.55005825,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        }
+      ]
+    },
+    {
+      "id": "fpt_004",
+      "category": "text",
+      "question": "Lợi nhuận sau thuế của FPT năm 2025 lũy kế cả năm đạt bao nhiêu tỷ đồng?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          1
+        ],
+        "chunk_types": [
+          "text"
+        ],
+        "numbers": [
+          "11.226"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 1
+          },
+          {
+            "rank": 2,
+            "page": 1
+          },
+          {
+            "rank": 3,
+            "page": 1
+          },
+          {
+            "rank": 4,
+            "page": 1
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "11.226"
+          },
+          {
+            "rank": 2,
+            "number": "11.226"
+          },
+          {
+            "rank": 3,
+            "number": "11.226"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.75055593,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.74987143,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.74981666,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.64969206,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.6308334,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 6,
+          "score": 0.6308334,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.6308334,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.6302566,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.62530863,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 10,
+          "score": 0.6076249,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-faceted financial report presents several charts and diagrams that highlight the projected revenue and profit targets for the company fpt from 2023 to 2025. the first chart, a dual-axis bar graph, illustrates fpt's revenue in trillion vnd "
+        }
+      ]
+    },
+    {
+      "id": "fpt_005",
+      "category": "text",
+      "question": "Lãi tiền gửi FPT ghi nhận trong năm 2025 đạt bao nhiêu tỷ đồng và tăng trưởng bao nhiêu phần trăm so với cùng kỳ?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          3
+        ],
+        "chunk_types": [
+          "text"
+        ],
+        "numbers": [
+          "510",
+          "42,3%"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 6,
+            "page": 3
+          },
+          {
+            "rank": 7,
+            "page": 3
+          },
+          {
+            "rank": 8,
+            "page": 3
+          },
+          {
+            "rank": 9,
+            "page": 3
+          },
+          {
+            "rank": 10,
+            "page": 3
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 6,
+            "number": "510"
+          },
+          {
+            "rank": 6,
+            "number": "42,3%"
+          },
+          {
+            "rank": 7,
+            "number": "510"
+          },
+          {
+            "rank": 7,
+            "number": "42,3%"
+          },
+          {
+            "rank": 8,
+            "number": "510"
+          },
+          {
+            "rank": 8,
+            "number": "42,3%"
+          },
+          {
+            "rank": 9,
+            "number": "510"
+          },
+          {
+            "rank": 9,
+            "number": "42,3%"
+          },
+          {
+            "rank": 10,
+            "number": "510"
+          },
+          {
+            "rank": 10,
+            "number": "42,3%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.73344886,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.7299346,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.72993195,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.67261934,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.622442,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report provides key updates on the business performance of fpt corporation for the years 2023 to 2025. it includes a detailed analysis of revenue predictions, highlighting the anticipated growth in various sectors alongside respective "
+        },
+        {
+          "rank": 6,
+          "score": 0.5966202,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.5966202,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.5966202,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.5939033,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.59047306,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        }
+      ]
+    },
+    {
+      "id": "fpt_006",
+      "category": "table",
+      "question": "Theo Bảng cân đối kế toán, Tổng tài sản của FPT năm 2025 đạt mức bao nhiêu?",
+      "passed": false,
+      "checks": {
+        "page_hit": false,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          5
+        ],
+        "chunk_types": [
+          "table"
+        ],
+        "numbers": [
+          "88.089"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [],
+        "types": [
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          },
+          {
+            "rank": 9,
+            "type": "table"
+          },
+          {
+            "rank": 10,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 4,
+            "number": "88.089"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.70689297,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.7040843,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.7039774,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.61403584,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.5856706,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-faceted financial report presents several charts and diagrams that highlight the projected revenue and profit targets for the company fpt from 2023 to 2025. the first chart, a dual-axis bar graph, illustrates fpt's revenue in trillion vnd "
+        },
+        {
+          "rank": 6,
+          "score": 0.58139706,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.58139706,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.58139706,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.5779263,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.5766769,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        }
+      ]
+    },
+    {
+      "id": "fpt_007",
+      "category": "table",
+      "question": "Lợi nhuận trên mỗi cổ phiếu EPS (VND) năm 2025 của FPT theo Bảng thông số cơ bản là bao nhiêu?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          1
+        ],
+        "chunk_types": [
+          "table"
+        ],
+        "numbers": [
+          "5.211"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 1
+          },
+          {
+            "rank": 2,
+            "page": 1
+          },
+          {
+            "rank": 3,
+            "page": 1
+          },
+          {
+            "rank": 4,
+            "page": 1
+          },
+          {
+            "rank": 5,
+            "page": 1
+          }
+        ],
+        "types": [
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          },
+          {
+            "rank": 9,
+            "type": "table"
+          },
+          {
+            "rank": 10,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "5.211"
+          },
+          {
+            "rank": 5,
+            "number": "5.211"
+          },
+          {
+            "rank": 6,
+            "number": "5.211"
+          },
+          {
+            "rank": 7,
+            "number": "5.211"
+          },
+          {
+            "rank": 8,
+            "number": "5.211"
+          },
+          {
+            "rank": 9,
+            "number": "5.211"
+          },
+          {
+            "rank": 10,
+            "number": "5.211"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.74868655,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 2,
+          "score": 0.7337127,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.73122036,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.7311255,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 5,
+          "score": 0.6993531,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report provides key updates on the business performance of fpt corporation for the years 2023 to 2025. it includes a detailed analysis of revenue predictions, highlighting the anticipated growth in various sectors alongside respective "
+        },
+        {
+          "rank": 6,
+          "score": 0.6534358,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 7,
+          "score": 0.6534358,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 8,
+          "score": 0.6517007,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.6517007,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.6517007,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        }
+      ]
+    },
+    {
+      "id": "fpt_008",
+      "category": "table",
+      "question": "Theo bảng Diễn giải Hoạt động kinh doanh năm 2025, doanh thu thuần mảng Viễn thông đạt bao nhiêu?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          3
+        ],
+        "chunk_types": [
+          "table"
+        ],
+        "numbers": [
+          "19.508"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 3
+          },
+          {
+            "rank": 2,
+            "page": 3
+          },
+          {
+            "rank": 3,
+            "page": 3
+          },
+          {
+            "rank": 4,
+            "page": 3
+          },
+          {
+            "rank": 5,
+            "page": 3
+          },
+          {
+            "rank": 6,
+            "page": 3
+          },
+          {
+            "rank": 7,
+            "page": 3
+          },
+          {
+            "rank": 8,
+            "page": 3
+          },
+          {
+            "rank": 9,
+            "page": 3
+          },
+          {
+            "rank": 10,
+            "page": 3
+          }
+        ],
+        "types": [
+          {
+            "rank": 5,
+            "type": "table"
+          },
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          },
+          {
+            "rank": 9,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "19.508"
+          },
+          {
+            "rank": 2,
+            "number": "19.508"
+          },
+          {
+            "rank": 3,
+            "number": "19.508"
+          },
+          {
+            "rank": 4,
+            "number": "19.508"
+          },
+          {
+            "rank": 5,
+            "number": "19.508"
+          },
+          {
+            "rank": 6,
+            "number": "19.508"
+          },
+          {
+            "rank": 7,
+            "number": "19.508"
+          },
+          {
+            "rank": 8,
+            "number": "19.508"
+          },
+          {
+            "rank": 9,
+            "number": "19.508"
+          },
+          {
+            "rank": 10,
+            "number": "19.508"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.65792704,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 2,
+          "score": 0.6577239,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557231,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 4,
+          "score": 0.59035015,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 5,
+          "score": 0.58411896,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 6,
+          "score": 0.5754266,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.5754266,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.5754266,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.57522166,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 10,
+          "score": 0.5101591,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this detailed financial report illustrates the business performance forecast for various sectors in 2025, specifically focusing on technology, telecommunications, and investment education. the chart clearly delineates several key financial figures fo"
+        }
+      ]
+    },
+    {
+      "id": "fpt_009",
+      "category": "table",
+      "question": "Theo bảng Các chỉ số sinh lời, tỷ suất sinh lời trên vốn chủ sở hữu (ROE) năm 2025 của FPT là bao nhiêu?",
+      "passed": false,
+      "checks": {
+        "page_hit": false,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          5
+        ],
+        "chunk_types": [
+          "table"
+        ],
+        "numbers": [
+          "28,3%"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [],
+        "types": [
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          },
+          {
+            "rank": 9,
+            "type": "table"
+          },
+          {
+            "rank": 10,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 4,
+            "number": "28,3%"
+          },
+          {
+            "rank": 5,
+            "number": "28,3%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.68274474,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.6747231,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.6746508,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.6569019,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.6153378,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report provides key updates on the business performance of fpt corporation for the years 2023 to 2025. it includes a detailed analysis of revenue predictions, highlighting the anticipated growth in various sectors alongside respective "
+        },
+        {
+          "rank": 6,
+          "score": 0.58496755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.58496755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.58496755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.5805805,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 10,
+          "score": 0.5805805,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        }
+      ]
+    },
+    {
+      "id": "fpt_010",
+      "category": "table",
+      "question": "Theo bảng Báo cáo lưu chuyển tiền tệ, tiền và tương đương tiền cuối kỳ năm 2025 đạt bao nhiêu?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          5
+        ],
+        "chunk_types": [
+          "table"
+        ],
+        "numbers": [
+          "10.541"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 5
+          },
+          {
+            "rank": 2,
+            "page": 5
+          },
+          {
+            "rank": 3,
+            "page": 5
+          },
+          {
+            "rank": 4,
+            "page": 5
+          },
+          {
+            "rank": 5,
+            "page": 5
+          },
+          {
+            "rank": 10,
+            "page": 5
+          }
+        ],
+        "types": [
+          {
+            "rank": 3,
+            "type": "table"
+          },
+          {
+            "rank": 4,
+            "type": "table"
+          },
+          {
+            "rank": 5,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 3,
+            "number": "10.541"
+          },
+          {
+            "rank": 4,
+            "number": "10.541"
+          },
+          {
+            "rank": 5,
+            "number": "10.541"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.6152521,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 5,
+          "preview": "427 | 11,226 | | | | | | | | lợi ích cổ đông thiểu số | 1,181 | 1,323 | 1,571 | 1,856 | | | | | | | | lnst của cty mẹ | 5,310 | 6,465 | 7,857 | 9,370 | | | | | | | | % biên lnst | 14.7% | 14.8% | 15.0% | 16.0% | | | | | | | | eps (vnd) | 3,847 | 4,05"
+        },
+        {
+          "rank": 2,
+          "score": 0.6146809,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 5,
+          "preview": "427 | 11,226 | | | | | | | | lợi ích cổ đông thiểu số | 1,181 | 1,323 | 1,571 | 1,856 | | | | | | | | lnst của cty mẹ | 5,310 | 6,465 | 7,857 | 9,370 | | | | | | | | % biên lnst | 14.7% | 14.8% | 15.0% | 16.0% | | | | | | | | eps (vnd) | 3,847 | 4,05"
+        },
+        {
+          "rank": 3,
+          "score": 0.59364474,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 4,
+          "score": 0.59364474,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 5,
+          "score": 0.59364474,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 6,
+          "score": 0.5919814,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.5171858,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 1,
+          "preview": "| tỷ vnd | 2023 | 2024 | 2025 | 2024 | 2025 | | ------------ | ------ | ------ | ------ | ---- | ---- | | tổng tài sản | 60.283 | 72.013 | 88.089 | | | | vcsh | 29.933 | 35.796 | 43.751 | | | | doanh thu | 52.618 | 62.849 | 70.113 | | | | lnst | 7.78"
+        },
+        {
+          "rank": 8,
+          "score": 0.5171858,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 1,
+          "preview": "| tỷ vnd | 2023 | 2024 | 2025 | 2024 | 2025 | | ------------ | ------ | ------ | ------ | ---- | ---- | | tổng tài sản | 60.283 | 72.013 | 88.089 | | | | vcsh | 29.933 | 35.796 | 43.751 | | | | doanh thu | 52.618 | 62.849 | 70.113 | | | | lnst | 7.78"
+        },
+        {
+          "rank": 9,
+          "score": 0.50953704,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 10,
+          "score": 0.45923194,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 5,
+          "preview": "this financial report details the balance sheet and income statement metrics of a company for the years 2022 through 2025. the results are expressed in trillion vnd. the left section of the table outlines the balance sheet data, including current ass"
+        }
+      ]
+    },
+    {
+      "id": "fpt_011",
+      "category": "image",
+      "question": "Theo biểu đồ \"Giá trị hợp đồng ký mới\", tổng giá trị hợp đồng FPT đạt được năm 2025 là bao nhiêu?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          4
+        ],
+        "chunk_types": [
+          "image"
+        ],
+        "numbers": [
+          "40.636"
+        ],
+        "image_hint": "Giá trị hợp đồng ký mới"
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 5,
+            "page": 4
+          }
+        ],
+        "types": [
+          {
+            "rank": 4,
+            "type": "image"
+          },
+          {
+            "rank": 5,
+            "type": "image"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "40.636"
+          },
+          {
+            "rank": 2,
+            "number": "40.636"
+          },
+          {
+            "rank": 3,
+            "number": "40.636"
+          },
+          {
+            "rank": 6,
+            "number": "40.636"
+          },
+          {
+            "rank": 7,
+            "number": "40.636"
+          },
+          {
+            "rank": 8,
+            "number": "40.636"
+          },
+          {
+            "rank": 9,
+            "number": "40.636"
+          },
+          {
+            "rank": 10,
+            "number": "40.636"
+          }
+        ],
+        "image_hint": true
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.6936764,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.69358695,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.6906183,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.6046889,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.5696211,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-faceted financial report presents several charts and diagrams that highlight the projected revenue and profit targets for the company fpt from 2023 to 2025. the first chart, a dual-axis bar graph, illustrates fpt's revenue in trillion vnd "
+        },
+        {
+          "rank": 6,
+          "score": 0.5530766,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 7,
+          "score": 0.5530766,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 8,
+          "score": 0.5486574,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.5486574,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.5486574,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        }
+      ]
+    },
+    {
+      "id": "fpt_012",
+      "category": "image",
+      "question": "Dựa vào biểu đồ \"Cơ cấu doanh thu theo thị trường\", thị trường Nhật Bản đóng góp tỷ trọng bao nhiêu phần trăm doanh thu năm 2025?",
+      "passed": false,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": false,
+        "image_hint_hit": false
+      },
+      "expected": {
+        "pages": [
+          4
+        ],
+        "chunk_types": [
+          "image"
+        ],
+        "numbers": [
+          "43,7%"
+        ],
+        "image_hint": "Cơ cấu doanh thu theo thị trường"
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 10,
+            "page": 4
+          }
+        ],
+        "types": [
+          {
+            "rank": 4,
+            "type": "image"
+          },
+          {
+            "rank": 10,
+            "type": "image"
+          }
+        ],
+        "numbers": [],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.63255805,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 2,
+          "score": 0.63241804,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 3,
+          "score": 0.6274334,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 4,
+          "score": 0.5700198,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 5,
+          "score": 0.56741405,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 6,
+          "score": 0.56741405,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 7,
+          "score": 0.56741405,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 8,
+          "score": 0.5673679,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 9,
+          "score": 0.5673679,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 10,
+          "score": 0.5182862,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-bar chart illustrates the year-over-year (yoy) revenue growth across various regions, specifically japan (nhật bản), the usa (mỹ), europe (châu âu), and the asia-pacific (apac) from the years 2020 to 2025. the vertical axis represents the "
+        }
+      ]
+    },
+    {
+      "id": "fpt_013",
+      "category": "image",
+      "question": "Dựa vào biểu đồ \"Doanh thu theo khối 2025\", khối Viễn thông chiếm tỷ trọng bao nhiêu phần trăm trong cơ cấu?",
+      "passed": false,
+      "checks": {
+        "page_hit": false,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": false
+      },
+      "expected": {
+        "pages": [
+          4
+        ],
+        "chunk_types": [
+          "image"
+        ],
+        "numbers": [
+          "28%"
+        ],
+        "image_hint": "Doanh thu theo khối 2025"
+      },
+      "hits": {
+        "pages": [],
+        "types": [
+          {
+            "rank": 4,
+            "type": "image"
+          },
+          {
+            "rank": 10,
+            "type": "image"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 8,
+            "number": "28%"
+          },
+          {
+            "rank": 9,
+            "number": "28%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.6152334,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 2,
+          "score": 0.6138632,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 3,
+          "score": 0.6136753,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 4,
+          "score": 0.5796919,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 5,
+          "score": 0.5638852,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 6,
+          "score": 0.5638852,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 7,
+          "score": 0.5638852,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 8,
+          "score": 0.5512843,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 1,
+          "preview": "| tỷ vnd | 2023 | 2024 | 2025 | 2024 | 2025 | | ------------ | ------ | ------ | ------ | ---- | ---- | | tổng tài sản | 60.283 | 72.013 | 88.089 | | | | vcsh | 29.933 | 35.796 | 43.751 | | | | doanh thu | 52.618 | 62.849 | 70.113 | | | | lnst | 7.78"
+        },
+        {
+          "rank": 9,
+          "score": 0.5512843,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 1,
+          "preview": "| tỷ vnd | 2023 | 2024 | 2025 | 2024 | 2025 | | ------------ | ------ | ------ | ------ | ---- | ---- | | tổng tài sản | 60.283 | 72.013 | 88.089 | | | | vcsh | 29.933 | 35.796 | 43.751 | | | | doanh thu | 52.618 | 62.849 | 70.113 | | | | lnst | 7.78"
+        },
+        {
+          "rank": 10,
+          "score": 0.5132852,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this detailed financial report illustrates the business performance forecast for various sectors in 2025, specifically focusing on technology, telecommunications, and investment education. the chart clearly delineates several key financial figures fo"
+        }
+      ]
+    },
+    {
+      "id": "fpt_014",
+      "category": "image",
+      "question": "Theo biểu đồ \"LNTT theo khối 2025\", mảng Giáo dục, Đầu tư và Khác đóng góp bao nhiêu phần trăm vào lợi nhuận trước thuế?",
+      "passed": false,
+      "checks": {
+        "page_hit": false,
+        "type_hit": true,
+        "number_hit": false,
+        "image_hint_hit": false
+      },
+      "expected": {
+        "pages": [
+          4
+        ],
+        "chunk_types": [
+          "image"
+        ],
+        "numbers": [
+          "34%"
+        ],
+        "image_hint": "LNTT theo khối 2025"
+      },
+      "hits": {
+        "pages": [],
+        "types": [
+          {
+            "rank": 4,
+            "type": "image"
+          },
+          {
+            "rank": 10,
+            "type": "image"
+          }
+        ],
+        "numbers": [],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.60516536,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.60516536,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.60516536,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.5598521,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 5,
+          "score": 0.5536784,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 6,
+          "score": 0.5536784,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 7,
+          "score": 0.5536784,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ----------------------------- | ------ | ------ | ------ | ------- | | lctt từ hđ kinh doanh | 5,054 | 9,517 | 11,704 | 10,189 | | lctt từ hđ đầu tư | 5,757 | -6,548 | -8,462 | -11,660 | | lctt từ hđ tài"
+        },
+        {
+          "rank": 8,
+          "score": 0.5395975,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 9,
+          "score": 0.5395975,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 10,
+          "score": 0.47344434,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this detailed financial report illustrates the business performance forecast for various sectors in 2025, specifically focusing on technology, telecommunications, and investment education. the chart clearly delineates several key financial figures fo"
+        }
+      ]
+    },
+    {
+      "id": "fpt_015",
+      "category": "image",
+      "question": "Biểu đồ \"Tăng trưởng doanh thu tại các thị trường (YoY)\" thể hiện thị trường nào có mức tăng trưởng âm trong năm 2025?",
+      "passed": false,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": false
+      },
+      "expected": {
+        "pages": [
+          4
+        ],
+        "chunk_types": [
+          "image"
+        ],
+        "numbers": [
+          "APAC",
+          "-0,8%"
+        ],
+        "image_hint": "Tăng trưởng doanh thu tại các thị trường YoY"
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 4,
+            "page": 4
+          },
+          {
+            "rank": 5,
+            "page": 4
+          },
+          {
+            "rank": 6,
+            "page": 4
+          },
+          {
+            "rank": 7,
+            "page": 4
+          },
+          {
+            "rank": 9,
+            "page": 4
+          }
+        ],
+        "types": [
+          {
+            "rank": 8,
+            "type": "image"
+          },
+          {
+            "rank": 9,
+            "type": "image"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "APAC"
+          },
+          {
+            "rank": 1,
+            "number": "-0,8%"
+          },
+          {
+            "rank": 2,
+            "number": "APAC"
+          },
+          {
+            "rank": 2,
+            "number": "-0,8%"
+          },
+          {
+            "rank": 3,
+            "number": "APAC"
+          },
+          {
+            "rank": 3,
+            "number": "-0,8%"
+          },
+          {
+            "rank": 9,
+            "number": "APAC"
+          },
+          {
+            "rank": 10,
+            "number": "APAC"
+          },
+          {
+            "rank": 10,
+            "number": "-0,8%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.63998747,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 2,
+          "score": 0.6399627,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 3,
+          "score": 0.63352466,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 4,
+          "score": 0.6223755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 4,
+          "preview": "| | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | | ----------------------------------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ---- | | tăng trưrng doanh thu tai các thi trưròng (yoy) | 13.7% | 15.3% | 17.7% |"
+        },
+        {
+          "rank": 5,
+          "score": 0.6223755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 4,
+          "preview": "| | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | | ----------------------------------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ---- | | tăng trưrng doanh thu tai các thi trưròng (yoy) | 13.7% | 15.3% | 17.7% |"
+        },
+        {
+          "rank": 6,
+          "score": 0.6223755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 4,
+          "preview": "| | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | | ----------------------------------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ---- | | tăng trưrng doanh thu tai các thi trưròng (yoy) | 13.7% | 15.3% | 17.7% |"
+        },
+        {
+          "rank": 7,
+          "score": 0.6223755,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 4,
+          "preview": "| | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | | ----------------------------------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ---- | | tăng trưrng doanh thu tai các thi trưròng (yoy) | 13.7% | 15.3% | 17.7% |"
+        },
+        {
+          "rank": 8,
+          "score": 0.5865158,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 9,
+          "score": 0.5861236,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-bar chart illustrates the year-over-year (yoy) revenue growth across various regions, specifically japan (nhật bản), the usa (mỹ), europe (châu âu), and the asia-pacific (apac) from the years 2020 to 2025. the vertical axis represents the "
+        },
+        {
+          "rank": 10,
+          "score": 0.5600848,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        }
+      ]
+    },
+    {
+      "id": "fpt_016",
+      "category": "mixed",
+      "question": "Doanh thu mảng công nghệ năm 2025 theo bảng \"Hoạt động kinh doanh\" và tỷ trọng đóng góp của mảng này theo đoạn text tổng quan đạt bao nhiêu?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          1,
+          3
+        ],
+        "chunk_types": [
+          "table",
+          "text"
+        ],
+        "numbers": [
+          "44.475",
+          "63%"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 3
+          },
+          {
+            "rank": 2,
+            "page": 3
+          },
+          {
+            "rank": 3,
+            "page": 3
+          },
+          {
+            "rank": 4,
+            "page": 3
+          },
+          {
+            "rank": 5,
+            "page": 3
+          },
+          {
+            "rank": 6,
+            "page": 3
+          },
+          {
+            "rank": 7,
+            "page": 3
+          },
+          {
+            "rank": 8,
+            "page": 3
+          },
+          {
+            "rank": 9,
+            "page": 3
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          },
+          {
+            "rank": 5,
+            "type": "table"
+          },
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          },
+          {
+            "rank": 9,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "44.475"
+          },
+          {
+            "rank": 1,
+            "number": "63%"
+          },
+          {
+            "rank": 2,
+            "number": "44.475"
+          },
+          {
+            "rank": 2,
+            "number": "63%"
+          },
+          {
+            "rank": 3,
+            "number": "44.475"
+          },
+          {
+            "rank": 3,
+            "number": "63%"
+          },
+          {
+            "rank": 4,
+            "number": "44.475"
+          },
+          {
+            "rank": 5,
+            "number": "44.475"
+          },
+          {
+            "rank": 5,
+            "number": "63%"
+          },
+          {
+            "rank": 6,
+            "number": "44.475"
+          },
+          {
+            "rank": 6,
+            "number": "63%"
+          },
+          {
+            "rank": 7,
+            "number": "44.475"
+          },
+          {
+            "rank": 7,
+            "number": "63%"
+          },
+          {
+            "rank": 8,
+            "number": "44.475"
+          },
+          {
+            "rank": 8,
+            "number": "63%"
+          },
+          {
+            "rank": 9,
+            "number": "44.475"
+          },
+          {
+            "rank": 9,
+            "number": "63%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.64928055,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 2,
+          "score": 0.64914626,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 3,
+          "score": 0.6476807,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 4,
+          "score": 0.55609715,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 5,
+          "score": 0.55511534,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 6,
+          "score": 0.55481875,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 7,
+          "score": 0.55481875,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 8,
+          "score": 0.5509602,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.5509602,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.49090677,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this dual-axis chart illustrates the revenue from digital transformation (doanh thu chuyển đổi số) in vietnam, measured in billions of vnd, alongside the year-over-year (yoy) growth percentage from 2018 to a forecasted 2025. the x-axis represents the"
+        }
+      ]
+    },
+    {
+      "id": "fpt_017",
+      "category": "mixed",
+      "question": "Biên lợi nhuận ròng của FPT năm 2025 đạt bao nhiêu phần trăm theo đoạn text tóm tắt và giá trị Lợi nhuận sau thuế của công ty mẹ ghi nhận trên Báo cáo kết quả kinh doanh là bao nhiêu?",
+      "passed": false,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": false,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          3,
+          5
+        ],
+        "chunk_types": [
+          "table",
+          "text"
+        ],
+        "numbers": [
+          "16,0%",
+          "9.370"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 4,
+            "page": 3
+          },
+          {
+            "rank": 5,
+            "page": 3
+          },
+          {
+            "rank": 6,
+            "page": 3
+          },
+          {
+            "rank": 7,
+            "page": 3
+          },
+          {
+            "rank": 8,
+            "page": 3
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          },
+          {
+            "rank": 4,
+            "type": "table"
+          },
+          {
+            "rank": 5,
+            "type": "table"
+          },
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 4,
+            "number": "16,0%"
+          },
+          {
+            "rank": 5,
+            "number": "16,0%"
+          },
+          {
+            "rank": 6,
+            "number": "16,0%"
+          },
+          {
+            "rank": 7,
+            "number": "16,0%"
+          },
+          {
+            "rank": 8,
+            "number": "16,0%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.77310365,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.7716279,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.77162117,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.6777748,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 5,
+          "score": 0.6777748,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 6,
+          "score": 0.6777748,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 7,
+          "score": 0.6762867,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 8,
+          "score": 0.6693562,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 9,
+          "score": 0.66245365,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 10,
+          "score": 0.6441575,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 4,
+          "preview": "this multi-faceted financial report presents several charts and diagrams that highlight the projected revenue and profit targets for the company fpt from 2023 to 2025. the first chart, a dual-axis bar graph, illustrates fpt's revenue in trillion vnd "
+        }
+      ]
+    },
+    {
+      "id": "fpt_018",
+      "category": "mixed",
+      "question": "Chi phí hoạt động (SG&A) năm 2025 theo Báo cáo kết quả kinh doanh và theo bảng tóm tắt chỉ tiêu tài chính đầu báo cáo có sự chênh lệch như thế nào?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          3,
+          5
+        ],
+        "chunk_types": [
+          "table"
+        ],
+        "numbers": [
+          "14.912",
+          "14.911"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 3
+          },
+          {
+            "rank": 2,
+            "page": 3
+          },
+          {
+            "rank": 3,
+            "page": 3
+          },
+          {
+            "rank": 6,
+            "page": 5
+          },
+          {
+            "rank": 7,
+            "page": 5
+          },
+          {
+            "rank": 8,
+            "page": 5
+          },
+          {
+            "rank": 9,
+            "page": 3
+          },
+          {
+            "rank": 10,
+            "page": 3
+          }
+        ],
+        "types": [
+          {
+            "rank": 4,
+            "type": "table"
+          },
+          {
+            "rank": 5,
+            "type": "table"
+          },
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 6,
+            "number": "14.912"
+          },
+          {
+            "rank": 7,
+            "number": "14.912"
+          },
+          {
+            "rank": 8,
+            "number": "14.912"
+          },
+          {
+            "rank": 10,
+            "number": "14.911"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.6063714,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 2,
+          "score": 0.6046028,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 3,
+          "score": 0.6044442,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 3,
+          "preview": "báo cáo phân tích doanh nghiệp # 2. hoạt động kinh doanh năm 2025 | đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62"
+        },
+        {
+          "rank": 4,
+          "score": 0.562091,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 1,
+          "preview": "| tỷ vnd | 2023 | 2024 | 2025 | 2024 | 2025 | | ------------ | ------ | ------ | ------ | ---- | ---- | | tổng tài sản | 60.283 | 72.013 | 88.089 | | | | vcsh | 29.933 | 35.796 | 43.751 | | | | doanh thu | 52.618 | 62.849 | 70.113 | | | | lnst | 7.78"
+        },
+        {
+          "rank": 5,
+          "score": 0.562091,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 1,
+          "preview": "| tỷ vnd | 2023 | 2024 | 2025 | 2024 | 2025 | | ------------ | ------ | ------ | ------ | ---- | ---- | | tổng tài sản | 60.283 | 72.013 | 88.089 | | | | vcsh | 29.933 | 35.796 | 43.751 | | | | doanh thu | 52.618 | 62.849 | 70.113 | | | | lnst | 7.78"
+        },
+        {
+          "rank": 6,
+          "score": 0.56131554,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 7,
+          "score": 0.56131554,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 8,
+          "score": 0.56124103,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 5,
+          "preview": "| (tỷ vnd) | 2022a | 2023a | 2024a | 2025a | | ------------------------------ | ------- | ------- | ------- | ------- | | doanh thu | 44,010 | 52,618 | 62,849 | 70,113 | | giá vốn hàng bán | 26,842 | 32,298 | 39,150 | 44,217 | | lợi nhuận gộp | 17,16"
+        },
+        {
+          "rank": 9,
+          "score": 0.56059736,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 10,
+          "score": 0.49915195,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this detailed financial report illustrates the business performance forecast for various sectors in 2025, specifically focusing on technology, telecommunications, and investment education. the chart clearly delineates several key financial figures fo"
+        }
+      ]
+    },
+    {
+      "id": "fpt_019",
+      "category": "mixed",
+      "question": "Theo Bảng thông số cơ bản, hệ số P/E năm 2025 của FPT là bao nhiêu và theo đoạn text khuyến nghị đầu báo cáo thì giá cổ phiếu hiện tại ở mức nào?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          1
+        ],
+        "chunk_types": [
+          "table",
+          "text"
+        ],
+        "numbers": [
+          "19,6",
+          "102.100"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 1
+          },
+          {
+            "rank": 2,
+            "page": 1
+          },
+          {
+            "rank": 3,
+            "page": 1
+          },
+          {
+            "rank": 4,
+            "page": 1
+          },
+          {
+            "rank": 5,
+            "page": 1
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          },
+          {
+            "rank": 6,
+            "type": "table"
+          },
+          {
+            "rank": 7,
+            "type": "table"
+          },
+          {
+            "rank": 8,
+            "type": "table"
+          },
+          {
+            "rank": 9,
+            "type": "table"
+          },
+          {
+            "rank": 10,
+            "type": "table"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "102.100"
+          },
+          {
+            "rank": 2,
+            "number": "102.100"
+          },
+          {
+            "rank": 3,
+            "number": "102.100"
+          },
+          {
+            "rank": 4,
+            "number": "19,6"
+          },
+          {
+            "rank": 5,
+            "number": "19,6"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.72625846,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 2,
+          "score": 0.7207582,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 3,
+          "score": 0.72066104,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 1,
+          "preview": "công ty cổ phần tập đoàn fpt (hose: fpt) báo cáo cập nhật - 27/01/2026 # cập nhật kết quả kinh doanh 2025 phó phòng phân tích: ngô thế hiển email: hien.nth@shs.com.vn khuyến nghị: nắm giữ giá hiện tại (27/01/2026): 102.100 vnd chúng tôi đang xem xét "
+        },
+        {
+          "rank": 4,
+          "score": 0.6845232,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report contains various statistical data regarding fpt corporation, projected for the year 2025. the key figures for the total assets in vnd are outlined for the years 2023, 2024, and 2025, showing a progressive increase from 60.283 bi"
+        },
+        {
+          "rank": 5,
+          "score": 0.6464015,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 1,
+          "preview": "this financial report provides key updates on the business performance of fpt corporation for the years 2023 to 2025. it includes a detailed analysis of revenue predictions, highlighting the anticipated growth in various sectors alongside respective "
+        },
+        {
+          "rank": 6,
+          "score": 0.6127975,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 7,
+          "score": 0.6127975,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 8,
+          "score": 0.60963446,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.60963446,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.60963446,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        }
+      ]
+    },
+    {
+      "id": "fpt_020",
+      "category": "mixed",
+      "question": "Theo text, doanh thu ngành ICT Việt Nam năm 2025 tăng bao nhiêu phần trăm so với năm 2024, và theo trích dẫn từ biểu đồ, xuất khẩu phần cứng điện tử ước đạt bao nhiêu tỷ USD?",
+      "passed": true,
+      "checks": {
+        "page_hit": true,
+        "type_hit": true,
+        "number_hit": true,
+        "image_hint_hit": true
+      },
+      "expected": {
+        "pages": [
+          2
+        ],
+        "chunk_types": [
+          "image",
+          "text"
+        ],
+        "numbers": [
+          "26%",
+          "178"
+        ],
+        "image_hint": null
+      },
+      "hits": {
+        "pages": [
+          {
+            "rank": 1,
+            "page": 2
+          },
+          {
+            "rank": 2,
+            "page": 2
+          },
+          {
+            "rank": 3,
+            "page": 2
+          },
+          {
+            "rank": 6,
+            "page": 2
+          }
+        ],
+        "types": [
+          {
+            "rank": 1,
+            "type": "text"
+          },
+          {
+            "rank": 2,
+            "type": "text"
+          },
+          {
+            "rank": 3,
+            "type": "text"
+          },
+          {
+            "rank": 6,
+            "type": "image"
+          },
+          {
+            "rank": 7,
+            "type": "image"
+          }
+        ],
+        "numbers": [
+          {
+            "rank": 1,
+            "number": "26%"
+          },
+          {
+            "rank": 1,
+            "number": "178"
+          },
+          {
+            "rank": 2,
+            "number": "26%"
+          },
+          {
+            "rank": 2,
+            "number": "178"
+          },
+          {
+            "rank": 3,
+            "number": "26%"
+          },
+          {
+            "rank": 3,
+            "number": "178"
+          },
+          {
+            "rank": 4,
+            "number": "26%"
+          },
+          {
+            "rank": 5,
+            "number": "26%"
+          },
+          {
+            "rank": 8,
+            "number": "26%"
+          },
+          {
+            "rank": 9,
+            "number": "26%"
+          },
+          {
+            "rank": 10,
+            "number": "26%"
+          }
+        ],
+        "image_hint": false
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.7431491,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 2,
+          "preview": "báo cáo phân tích doanh nghiệp # 1. thị trường cntt chi tiêu cntt toàn cầu năm 2025 dự báo đạt 4,25 nghìn tỷ usd. chi tiêu cho lĩnh vực cntt năm 2025 dự báo sẽ đạt mức tăng trưởng 14% theo idc, cao nhất kể từ năm 1996 khi windows 95 ra rời mở ra giai"
+        },
+        {
+          "rank": 2,
+          "score": 0.74312055,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 2,
+          "preview": "báo cáo phân tích doanh nghiệp # 1. thị trường cntt chi tiêu cntt toàn cầu năm 2025 dự báo đạt 4,25 nghìn tỷ usd. chi tiêu cho lĩnh vực cntt năm 2025 dự báo sẽ đạt mức tăng trưởng 14% theo idc, cao nhất kể từ năm 1996 khi windows 95 ra rời mở ra giai"
+        },
+        {
+          "rank": 3,
+          "score": 0.7424717,
+          "source_collection": "text",
+          "chunk_type": "text",
+          "page": 2,
+          "preview": "báo cáo phân tích doanh nghiệp # 1. thị trường cntt chi tiêu cntt toàn cầu năm 2025 dự báo đạt 4,25 nghìn tỷ usd. chi tiêu cho lĩnh vực cntt năm 2025 dự báo sẽ đạt mức tăng trưởng 14% theo idc, cao nhất kể từ năm 1996 khi windows 95 ra rời mở ra giai"
+        },
+        {
+          "rank": 4,
+          "score": 0.55408514,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 5,
+          "score": 0.55408514,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | ------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------- | | doanh thu thuần | 62.849 | 70.112 | +11,6% | doanh thu mảng công nghệ"
+        },
+        {
+          "rank": 6,
+          "score": 0.551971,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 2,
+          "preview": "this vertical bar chart illustrates the export data of various electronic goods from 2018 to 2025, measured in units exported. the x-axis represents the years from 2018 to 2025, while the y-axis indicates the number of units exported, with values ran"
+        },
+        {
+          "rank": 7,
+          "score": 0.54209745,
+          "source_collection": "image",
+          "chunk_type": "image",
+          "page": 3,
+          "preview": "this comprehensive financial report illustrates the projected operational performance for 2025 in various sectors including technology, telecommunications, and education & investment. the chart features a two-column structure detailing the revenue fi"
+        },
+        {
+          "rank": 8,
+          "score": 0.5414616,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 9,
+          "score": 0.5413762,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        },
+        {
+          "rank": 10,
+          "score": 0.5413762,
+          "source_collection": "table",
+          "chunk_type": "table",
+          "page": 3,
+          "preview": "| đơn vị: tỷ vnd | 2024 | 2025 | %yoy | diễn giải | | -------------------- | ------ | ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------"
+        }
+      ]
+    }
+  ]
+}
