@@ -103,11 +103,18 @@ def should_keep_box(
     return True
 
 
-def clamp_box(box: tuple[float, float, float, float], width: int, height: int, padding: int) -> tuple[int, int, int, int]:
+def clamp_box(
+    box: tuple[float, float, float, float],
+    width: int,
+    height: int,
+    padding: int,
+    top_padding: int | None = None,
+) -> tuple[int, int, int, int]:
     x1, y1, x2, y2 = box
+    effective_top_padding = padding if top_padding is None else top_padding
     return (
         max(0, round(x1) - padding),
-        max(0, round(y1) - padding),
+        max(0, round(y1) - effective_top_padding),
         min(width, round(x2) + padding),
         min(height, round(y2) + padding),
     )
@@ -148,6 +155,7 @@ def detect_page(
     imgsz: int,
     device: str,
     padding: int,
+    top_padding: int,
     crop_labels: set[str],
     max_area_ratio: float,
     min_width: int,
@@ -176,7 +184,7 @@ def detect_page(
             class_id = int(box.cls[0].item())
             confidence = float(box.conf[0].item())
             label = names.get(class_id, str(class_id))
-            x1, y1, x2, y2 = clamp_box(tuple(xyxy), width, height, padding)
+            x1, y1, x2, y2 = clamp_box(tuple(xyxy), width, height, padding, top_padding)
 
             if not should_keep_box(
                 label=label,
@@ -239,6 +247,12 @@ def main() -> None:
     parser.add_argument("--conf", type=float, default=0.20)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--padding", type=int, default=8)
+    parser.add_argument(
+        "--top-padding",
+        type=int,
+        default=56,
+        help="Extra upward crop padding to keep chart titles that sit just above detected figures.",
+    )
     parser.add_argument("--max-area-ratio", type=float, default=0.45)
     parser.add_argument("--min-width", type=int, default=120)
     parser.add_argument("--min-height", type=int, default=80)
@@ -267,6 +281,7 @@ def main() -> None:
             imgsz=args.imgsz,
             device=args.device,
             padding=args.padding,
+            top_padding=args.top_padding,
             crop_labels=crop_labels,
             max_area_ratio=args.max_area_ratio,
             min_width=args.min_width,

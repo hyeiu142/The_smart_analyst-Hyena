@@ -61,17 +61,19 @@ def normalize_number(value: str) -> str:
 def number_variants(value: str) -> set[str]:
     raw = normalize_text(value)
     normalized = normalize_number(value)
+
     variants = {raw, normalized}
 
     if "." in normalized:
         variants.add(normalized.replace(".", ","))
         variants.add(normalized.replace(".", ""))
+
     if "," in raw:
         variants.add(raw.replace(",", "."))
     if "." in raw:
         variants.add(raw.replace(".", ","))
 
-    return {variant for variant in variants if variant}
+    return {v for v in variants if v}
 
 
 def get_chunk_page(chunk: dict[str, Any]) -> int | None:
@@ -90,13 +92,15 @@ def get_chunk_page(chunk: dict[str, Any]) -> int | None:
 
 def get_chunk_type(chunk: dict[str, Any]) -> str | None:
     metadata = chunk.get("metadata") or {}
-    source_collection = chunk.get("source_collection")
     chunk_type = metadata.get("chunk_type")
+    source_collection = chunk.get("source_collection")
 
     if source_collection:
         return normalize_text(source_collection)
+
     if chunk_type == "image_caption":
         return "image"
+
     return normalize_text(chunk_type)
 
 
@@ -107,6 +111,7 @@ def contains_expected_number(content: str, expected_number: str) -> bool:
     for variant in number_variants(expected_number):
         if variant in normalized_content or variant in normalized_content_number:
             return True
+
     return False
 
 
@@ -128,6 +133,7 @@ def evaluate_case(case: dict[str, Any], results: list[dict[str, Any]]) -> dict[s
 
         if page in expected_pages:
             hit_pages.append({"rank": rank, "page": page})
+
         if chunk_type in expected_types:
             hit_types.append({"rank": rank, "type": chunk_type})
 
@@ -139,10 +145,12 @@ def evaluate_case(case: dict[str, Any], results: list[dict[str, Any]]) -> dict[s
             hit_image_hint = True
 
     found_numbers = {item["number"] for item in hit_numbers}
+
     page_hit = not expected_pages or bool(hit_pages)
     type_hit = not expected_types or bool(hit_types)
     number_hit = all(number in found_numbers for number in expected_numbers)
     image_hint_hit = expected_image_hint is None or hit_image_hint
+
     passed = page_hit and type_hit and number_hit and image_hint_hit
 
     return {
@@ -197,8 +205,9 @@ def summarize(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
     for bucket in by_category.values():
         bucket["pass_rate"] = round(bucket["passed"] / bucket["total"], 4) if bucket["total"] else 0.0
 
+    check_names = ["page_hit", "type_hit", "number_hit", "image_hint_hit"]
     check_rates = {}
-    for check_name in ["page_hit", "type_hit", "number_hit", "image_hint_hit"]:
+    for check_name in check_names:
         count = sum(1 for item in evaluations if item["checks"][check_name])
         check_rates[check_name] = round(count / total, 4) if total else 0.0
 
@@ -222,13 +231,17 @@ def write_outputs(
 
     report_path = report_dir / f"retrieval_eval_{timestamp}.json"
     failures_path = report_dir / f"retrieval_failures_{timestamp}.jsonl"
+
     report = {
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "summary": summary,
         "results": evaluations,
     }
 
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    report_path.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
     with failures_path.open("w", encoding="utf-8") as file:
         for item in evaluations:
@@ -252,6 +265,7 @@ def main() -> int:
     evaluations = []
     for index, case in enumerate(cases, start=1):
         print(f"[{index}/{len(cases)}] {case['id']}")
+
         payload = {
             "question": case["question"],
             "top_k": args.top_k,
