@@ -4,10 +4,11 @@ import uuid
 import mimetypes
 from typing import Any, Dict, List
 
+import httpx
 from openai import OpenAI
+from llama_parse import LlamaParse
 
 from backend.app.config import get_settings
-from backend.app.core.ingestion.doclayout_detector import DocLayoutFigureDetector
 
 settings = get_settings()
 
@@ -35,12 +36,18 @@ If this is completely NOT a chart/graph/data table (e.g. company logo, decorativ
 
 class ImageProcessor:
     """
-    Extract chart/figure crops from PDF via DocLayout-YOLO, then caption them.
+    Extract images từ PDF qua LlamaParse → dùng Gemini 2.0 Flash caption.
     Chỉ lưu chunks cho ảnh có ý nghĩa (charts/graphs), bỏ qua logo/ảnh trang trí.
     """
 
     def __init__(self):
-        self.detector = DocLayoutFigureDetector()
+        self.parser = LlamaParse(
+            api_key=settings.llama_cloud_api_key,
+            result_type="markdown",
+            language="vi",
+            verbose=False,
+            extract_images=True,
+        )
         self.openai_client = OpenAI(api_key=settings.openai_api_key)
 
     async def process(
@@ -49,22 +56,43 @@ class ImageProcessor:
         metadata: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """
-        Extract figure crops via DocLayout-YOLO, then caption each crop.
+        Extract images via LlamaParse and store lightweight placeholders.
+
+        LlamaParse flow:
+        1. aget_json() → parse result with image names/references
+        2. get_images(json_result, download_path) → download images to disk
+        3. Store pending image chunks; expensive vision captioning is done lazily at query time
         """
+        # Step 1: parse
+        json_result = await self.parser.aget_json(file_path)
+
+        # DEBUG: inspect json_result structure
+        print(f"[ImageProcessor] json_result type={type(json_result)}, len={len(json_result) if json_result else 0}")
+        if json_result:
+            first = json_result[0]
+            print(f"[ImageProcessor] first keys={list(first.keys()) if isinstance(first, dict) else type(first)}")
+            if isinstance(first, dict):
+                has_job_id = "job_id" in first
+                has_pages = "pages" in first
+                print(f"[ImageProcessor] has job_id={has_job_id}, has pages={has_pages}")
+                if has_pages:
+                    pages = first.get("pages", [])
+                    print(f"[ImageProcessor] page count={len(pages)}")
+                    if pages:
+                        page0 = pages[0]
+                        print(f"[ImageProcessor] page[0] keys={list(page0.keys())}")
+                        print(f"[ImageProcessor] page[0] images={page0.get('images', [])}")
+
         doc_id = metadata.get("doc_id", "unknown")
         upload_dir = settings.upload_dir
         download_path = os.path.join(upload_dir, 'images', doc_id)
         os.makedirs(download_path, exist_ok=True)
 
-        images = self.detector.extract_figures(
-            pdf_path=file_path,
-            doc_id=doc_id,
-            output_dir=download_path,
-        )
+        images = self._download_images_from_json(json_result, download_path)
         if not images:
             images = self._collect_local_images(download_path)
 
-        print(f"[ImageProcessor] Found {len(images)} figure crops from DocLayout-YOLO")
+        print(f"[ImageProcessor] Found {len(images)} images from LlamaParse")
 
         chunks = []
         for img_data in images:
@@ -88,38 +116,126 @@ class ImageProcessor:
 
             relative_image_url = f"/uploads/images/{doc_id}/{os.path.basename(img_path)}"
             
-            with open(img_path, "rb") as f:
-                img_bytes = f.read()
-
-            # detect mime type from extension
-            mime_type = mimetypes.guess_type(img_path)[0] or "image/png"
-            caption_data = self._caption_image_bytes(img_bytes, mime_type)
-            print(f"[ImageProcessor] Caption result: {caption_data}")
-
-            # Skip non-chart images (logos etc.)
-            if not caption_data.get("caption"):
-                print(f"[ImageProcessor] Skipping - non_chart or caption failed")
-                continue
-
-            content = f"{caption_data['caption']}\n\nKey data: {caption_data.get('key_data', '')}"
-
+            content = (
+                "Pending chart/image crop from financial report. "
+                f"Document page {page_num}. "
+                "This image has not been analyzed yet; describe it lazily when a chart/image question needs it."
+            )
             chunk = {
                 "id": str(uuid.uuid4()),
                 "content": content,
                 "metadata": {
                     **metadata,
                     "page_num": page_num,
-                    "chunk_type": "image_caption",
-                    "chart_type": caption_data.get("chart_type", "other"),
+                    "chunk_type": "image_pending",
+                    "chart_type": "pending",
+                    "image_status": "pending",
                     "image_path": relative_image_url,
-                    "bbox": img_data.get("bbox"),
-                    "detector_confidence": img_data.get("confidence"),
+                    "local_image_path": img_path,
                 },
             }
             chunks.append(chunk)
 
-        print(f"[ImageProcessor] Captioned {len(chunks)} image chunks")
+        print(f"[ImageProcessor] Stored {len(chunks)} pending image chunks")
         return chunks
+
+    def describe_chunk(self, chunk: Dict[str, Any]) -> Dict[str, Any] | None:
+        """Caption one pending image chunk on demand."""
+        metadata = dict(chunk.get("metadata") or {})
+        if metadata.get("image_status") == "described":
+            return None
+
+        img_path = metadata.get("local_image_path")
+        if not img_path and metadata.get("image_path"):
+            relative_path = str(metadata["image_path"]).lstrip("/")
+            if relative_path.startswith("uploads/"):
+                relative_path = relative_path[len("uploads/") :]
+            img_path = os.path.join(settings.upload_dir, relative_path)
+
+        if not img_path or not os.path.exists(img_path) or not self._is_valid_image_file(img_path):
+            print(f"[ImageProcessor] Lazy describe skipped - missing image: {img_path}")
+            return None
+
+        with open(img_path, "rb") as f:
+            img_bytes = f.read()
+
+        mime_type = mimetypes.guess_type(img_path)[0] or "image/png"
+        caption_data = self._caption_image_bytes(img_bytes, mime_type)
+        if not caption_data.get("caption"):
+            metadata.update({
+                "chunk_type": "image_caption",
+                "chart_type": "non_chart",
+                "image_status": "described",
+            })
+            content = "Non-chart image. No financial chart data was extracted."
+        else:
+            metadata.update({
+                "chunk_type": "image_caption",
+                "chart_type": caption_data.get("chart_type", "other"),
+                "image_status": "described",
+            })
+            content = f"{caption_data['caption']}\n\nKey data: {caption_data.get('key_data', '')}"
+
+        return {
+            "id": chunk["id"],
+            "content": content,
+            "metadata": metadata,
+        }
+
+    def _download_images_from_json(self, json_result: List[dict], download_path: str) -> List[Dict[str, Any]]:
+        """Download LlamaParse image artifacts with HTTP/file validation."""
+        if not json_result:
+            return []
+
+        headers = {"Authorization": f"Bearer {settings.llama_cloud_api_key}"}
+        images: List[Dict[str, Any]] = []
+
+        with httpx.Client(timeout=60.0) as client:
+            for result in json_result:
+                job_id = result.get("job_id")
+                pages = result.get("pages") or []
+                if not job_id:
+                    print("[ImageProcessor] Skipping result without job_id")
+                    continue
+
+                for page in pages:
+                    page_number = page.get("page", page.get("page_number", 1))
+                    for image in page.get("images") or []:
+                        image_name = image.get("name") or image.get("image_name")
+                        if not image_name:
+                            continue
+
+                        filename = f"{job_id}-{image_name}"
+                        if not filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                            filename += ".png"
+
+                        image_path = os.path.join(download_path, filename)
+                        image_url = f"{self.parser.base_url}/api/parsing/job/{job_id}/result/image/{image_name}"
+
+                        try:
+                            response = client.get(image_url, headers=headers)
+                            response.raise_for_status()
+                        except Exception as exc:
+                            print(f"[ImageProcessor] Download failed for {image_name}: {exc}")
+                            continue
+
+                        content_type = response.headers.get("content-type", "")
+                        if "image" not in content_type and not self._looks_like_image(response.content):
+                            print(f"[ImageProcessor] Download skipped - non-image response for {image_name}: {content_type}")
+                            continue
+
+                        with open(image_path, "wb") as f:
+                            f.write(response.content)
+
+                        images.append({
+                            **image,
+                            "path": image_path,
+                            "job_id": job_id,
+                            "page_number": page_number,
+                            "original_pdf_path": result.get("file_path"),
+                        })
+
+        return images
 
     def _collect_local_images(self, download_path: str) -> List[Dict[str, Any]]:
         """Fallback for reruns: reuse valid images already present on disk."""

@@ -71,12 +71,46 @@ class QueryAnalyzer:
         except Exception as e:
             
             print(f"[QueryAnalyzer] Failed: {e}, using fallback")
-            return {
-                "intent": "other",
-                "entities": {},
-                "data_types_needed": ["text", "table"],
-                "sub_questions": [question],
-            }
+            return self._fallback_analysis(question)
+
+    def _fallback_analysis(self, question: str) -> Dict[str, Any]:
+        normalized = question.lower()
+        number_keywords = [
+            "revenue",
+            "profit",
+            "margin",
+            "doanh thu",
+            "lợi nhuận",
+            "lãi",
+            "eps",
+            "roe",
+            "roa",
+        ]
+        image_keywords = [
+            "biểu đồ",
+            "chart",
+            "hình",
+            "figure",
+            "cơ cấu",
+            "yoy",
+            "theo khối",
+            "thị trường",
+        ]
+
+        data_types = ["text"]
+        if any(keyword in normalized for keyword in number_keywords):
+            data_types.append("table")
+        if any(keyword in normalized for keyword in image_keywords):
+            data_types.append("image")
+
+        intent = "fact_lookup" if any(keyword in normalized for keyword in number_keywords) else "other"
+
+        return {
+            "intent": intent,
+            "entities": {},
+            "data_types_needed": data_types,
+            "sub_questions": [question],
+        }
 
     def build_filters(self, analysis: Dict) -> Dict:
         """

@@ -11,6 +11,7 @@ from backend.app.core.retrieval.embedder import Embedder
 from backend.app.core.cache.semantic_cache import SemanticCache
 from backend.app.core.generation.query_analyzer import QueryAnalyzer
 from backend.app.core.generation.context_builder import ContextBuilder
+from backend.app.core.ingestion.image_processor import ImageProcessor
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -43,6 +44,7 @@ class RAGEngine:
         self.embedder = Embedder()
         self.analyzer = QueryAnalyzer()
         self.context_builder = ContextBuilder()
+        self.image_processor = ImageProcessor()
         self.cache = self._init_cache()
 
     def _init_cache(self) -> Optional[SemanticCache]:
@@ -103,6 +105,18 @@ class RAGEngine:
             filters=filters,
         )
 
+        if self._needs_image_analysis(analysis, question):
+            described_count = await asyncio.to_thread(self._describe_pending_images, chunks, 2)
+            if described_count:
+                logger.info(f"[RAG] Lazily described {described_count} image chunks; retrieving again")
+                chunks = self.retriever.retrieve(
+                    question=question,
+                    top_k_text=wide_k // 3,
+                    top_k_table=wide_k // 2,
+                    top_k_image=wide_k // 3,
+                    filters=filters,
+                )
+
         if not chunks:
             return {
                 "answer": "Không tìm thấy thông tin liên quan trong tài liệu.",
@@ -133,6 +147,51 @@ class RAGEngine:
             self.cache.set(question, result)
 
         return result
+
+    def _needs_image_analysis(self, analysis: Dict[str, Any], question: str) -> bool:
+        data_types = analysis.get("data_types_needed") or []
+        if "image" in {str(item).lower() for item in data_types}:
+            return True
+
+        normalized = question.lower()
+        image_keywords = [
+            "biểu đồ",
+            "chart",
+            "hình",
+            "figure",
+            "cơ cấu",
+            "yoy",
+            "theo khối",
+            "thị trường",
+        ]
+        return any(keyword in normalized for keyword in image_keywords)
+
+    def _describe_pending_images(self, chunks: List[Dict[str, Any]], max_images: int = 2) -> int:
+        pending_images = [
+            chunk
+            for chunk in chunks
+            if chunk.get("source_collection") == "image"
+            and (chunk.get("metadata") or {}).get("image_status") == "pending"
+        ]
+        if not pending_images:
+            return 0
+
+        updated_chunks: List[Dict[str, Any]] = []
+        for chunk in pending_images[:max_images]:
+            described = self.image_processor.describe_chunk(chunk)
+            if not described:
+                continue
+            described["vector"] = self.embedder.embed_documents(described["content"])
+            described["payload"] = {
+                "content": described["content"],
+                "metadata": described["metadata"],
+            }
+            updated_chunks.append(described)
+
+        if updated_chunks:
+            self.retriever.qdrant.upsert_chunks(self.retriever.qdrant.IMAGE_COLLECTION, updated_chunks)
+
+        return len(updated_chunks)
 
     def _synthesize(self, question: str, context: str) -> str:
         """Gọi LLM để generate answer từ context."""
@@ -183,6 +242,18 @@ Please answer based on the context above. Cite sources using [Source #N] format.
             top_k_image=wide_k // 6,
             filters=filters,
         )
+
+        if self._needs_image_analysis(analysis, question):
+            described_count = await asyncio.to_thread(self._describe_pending_images, chunks, 2)
+            if described_count:
+                logger.info(f"[RAG] Lazily described {described_count} image chunks; retrieving again")
+                chunks = self.retriever.retrieve(
+                    question=question,
+                    top_k_text=wide_k // 3,
+                    top_k_table=wide_k // 2,
+                    top_k_image=wide_k // 3,
+                    filters=filters,
+                )
 
         if not chunks:
             yield "Không tìm thấy thông tin liên quan trong tài liệu."
