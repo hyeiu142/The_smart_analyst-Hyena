@@ -15,6 +15,7 @@ def utc_now_iso() -> str:
 @dataclass
 class RAGTrace:
     question: str
+    mode: str = "query"
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     started_at: str = field(default_factory=utc_now_iso)
     ended_at: str | None = None
@@ -44,6 +45,9 @@ class RAGTrace:
         for key, value in usage.items():
             self.tokens[f"{prefix}_{key}"] = int(value or 0)
 
+    def add_cost(self, key: str, value: float) -> None:
+        self.cost[key] = round(float(value or 0), 6)
+
     def finish(self, status: str = "success", error: str | None = None) -> None:
         self.status = status
         self.error = error
@@ -53,6 +57,7 @@ class RAGTrace:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "request_id": self.request_id,
+            "mode": self.mode,
             "question": self.question,
             "started_at": self.started_at,
             "ended_at": self.ended_at,

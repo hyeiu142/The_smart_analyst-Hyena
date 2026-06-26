@@ -83,6 +83,7 @@ const Api = {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let sources = [];
 
       while (true) {
         const { done, value } = await reader.read();
@@ -94,15 +95,16 @@ const Api = {
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
           const data = line.slice(6).trim();
-          if (data === '[DONE]') { onDone && onDone(); return; }
+          if (data === '[DONE]') { onDone && onDone(sources); return; }
           try {
             const json = JSON.parse(data);
             if (json.token) onToken && onToken(json.token);
+            if (json.sources) sources = json.sources;
             if (json.error) throw new Error(json.error);
           } catch (e) { /* skip malformed */ }
         }
       }
-      onDone && onDone();
+      onDone && onDone(sources);
     } catch (e) {
       onError && onError(e);
     }

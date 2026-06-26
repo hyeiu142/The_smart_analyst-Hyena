@@ -56,12 +56,13 @@ async def query_stream(request: QueryRequest):
                 filters["year"] = request.year
             filters = filters if filters else None
 
-            async for token in rag_engine.stream_query(
+            async for event in rag_engine.stream_query(
                 question=request.question,
                 top_k=request.top_k,
                 filters=filters,
             ):
-                yield f"data: {json.dumps({'token': token})}\n\n"
+                payload = event if isinstance(event, dict) else {"token": event}
+                yield f"data: {json.dumps(payload)}\n\n"
 
             yield "data: [DONE]\n\n"
         except Exception as e:
@@ -97,4 +98,3 @@ async def cache_stats():
         return {"cache": stats}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

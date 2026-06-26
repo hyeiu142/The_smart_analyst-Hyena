@@ -86,7 +86,7 @@ class RAGEngine:
                 "analysis": {...}  # query analysis result
             }
         """
-        trace = RAGTrace(question=question)
+        trace = RAGTrace(question=question, mode="query")
         try:
             # 0. Check semantic cache first
             with trace.step("cache_lookup"):
@@ -297,7 +297,7 @@ Please answer based on the context above. Cite sources using [Source #N] format.
         """
         from typing import AsyncGenerator
 
-        trace = RAGTrace(question=question)
+        trace = RAGTrace(question=question, mode="query_stream")
         try:
             with trace.step("analysis"):
                 analysis = self.analyzer.analyze(question)
@@ -353,7 +353,9 @@ Please answer based on the context above. Cite sources using [Source #N] format.
 
             with trace.step("context_build"):
                 context = self.context_builder.build(chunks)
+                citations = self.context_builder.build_citations(chunks)
             trace.set_metric("context_chars", len(context))
+            trace.set_metric("citations_count", len(citations))
 
             user_message = f"""Context from financial documents:
 {context}
@@ -377,7 +379,8 @@ Please answer based on the context above. Cite sources using [Source #N] format.
                 for chunk in stream:
                     delta = chunk.choices[0].delta.content
                     if delta:
-                        yield delta
+                        yield {"token": delta}
+            yield {"sources": citations}
             trace.finish("success")
         except Exception as exc:
             trace.finish("error", str(exc))

@@ -76,9 +76,11 @@ const Chat = (() => {
           scrollToBottom(document.getElementById('chat-messages'));
         },
         // onDone
-        () => {
-          // Fetch full result for citations via non-streaming query
-          fetchCitations(question, company, year, assistantMsgEl);
+        (sources) => {
+          if (sources && sources.length > 0) {
+            pendingSources = sources;
+            renderCitations(assistantMsgEl, sources);
+          }
           setLoading(false);
         },
         // onError
@@ -102,18 +104,6 @@ const Chat = (() => {
       removeTyping(typingId);
       appendMessage('assistant', `❌ Lỗi: ${e.message}`, []);
       setLoading(false);
-    }
-  }
-
-  async function fetchCitations(question, company, year, msgEl) {
-    try {
-      const result = await Api.query(question, { company: company || null, year: year || null });
-      if (result.sources && result.sources.length > 0) {
-        pendingSources = result.sources;
-        renderCitations(msgEl, result.sources);
-      }
-    } catch (e) {
-      console.warn('Failed to fetch citations:', e);
     }
   }
 

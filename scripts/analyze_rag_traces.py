@@ -18,7 +18,12 @@ def load_traces(path: Path) -> List[Dict[str, Any]]:
             line = line.strip()
             if not line:
                 continue
-            traces.append(json.loads(line))
+            try:
+                trace = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(trace, dict):
+                traces.append(trace)
 
     return traces
 
@@ -69,14 +74,53 @@ def summarize(traces: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+def print_human_summary(summary: Dict[str, Any]) -> None:
+    print("RAG Observability Summary")
+    print("=========================")
+    print(f"Requests        : {summary['total_requests']}")
+    print(f"Success / Errors: {summary['successes']} / {summary['errors']}")
+    print(f"Cache hits      : {summary['cache_hits']}")
+    print(f"Image triggers  : {summary['image_lazy_triggers']}")
+    print(f"Images described: {summary['images_described']}")
+    print(f"Latency avg/p50/p95 ms: {summary['avg_latency_ms']} / {summary['p50_latency_ms']} / {summary['p95_latency_ms']}")
+    print(f"Estimated cost  : ${summary['estimated_cost_usd']}")
+
+
+def print_recent(summaries: List[Dict[str, Any]], limit: int) -> None:
+    if not summaries or limit <= 0:
+        return
+
+    print()
+    print(f"Recent Requests ({min(limit, len(summaries))})")
+    print("================")
+    for item in summaries[-limit:]:
+        print(
+            f"- {item.get('started_at')} | {item.get('status')} | {item.get('mode')} | "
+            f"{item.get('total_latency_ms')} ms | slowest={item.get('slowest_step')} "
+            f"({item.get('slowest_step_ms')} ms)"
+        )
+        print(f"  id={item.get('request_id')}")
+        print(f"  q={item.get('question')}")
+        if item.get("error"):
+            print(f"  error={item.get('error')}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Summarize Hyena RAG trace JSONL logs.")
     parser.add_argument("--log", type=Path, default=Path("logs/rag_traces.jsonl"))
+    parser.add_argument("--summary-log", type=Path, default=Path("logs/rag_summary.jsonl"))
+    parser.add_argument("--recent", type=int, default=5)
+    parser.add_argument("--json", action="store_true", help="Print machine-readable JSON only.")
     args = parser.parse_args()
 
     traces = load_traces(args.log)
     summary = summarize(traces)
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if args.json:
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+        return 0
+
+    print_human_summary(summary)
+    print_recent(load_traces(args.summary_log), args.recent)
     return 0
 
 
