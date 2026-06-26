@@ -12,6 +12,10 @@ from backend.app.core.cache.semantic_cache import SemanticCache
 from backend.app.core.generation.query_analyzer import QueryAnalyzer
 from backend.app.core.generation.context_builder import ContextBuilder
 from backend.app.core.ingestion.image_processor import ImageProcessor
+from backend.app.core.observability.costs import estimate_openai_cost_usd
+from backend.app.core.observability.logger import JsonlTraceLogger
+from backend.app.core.observability.token_usage import openai_usage_to_dict
+from backend.app.core.observability.trace import RAGTrace
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -45,6 +49,7 @@ class RAGEngine:
         self.analyzer = QueryAnalyzer()
         self.context_builder = ContextBuilder()
         self.image_processor = ImageProcessor()
+        self.trace_logger = JsonlTraceLogger()
         self.cache = self._init_cache()
 
     def _init_cache(self) -> Optional[SemanticCache]:
@@ -81,72 +86,114 @@ class RAGEngine:
                 "analysis": {...}  # query analysis result
             }
         """
-        # 0. Check semantic cache first
-        if self.cache:
-            cached = self.cache.get(question)
-            if cached:
-                return cached
+        trace = RAGTrace(question=question)
+        try:
+            # 0. Check semantic cache first
+            with trace.step("cache_lookup"):
+                if self.cache:
+                    cached = self.cache.get(question)
+                    if cached:
+                        trace.set_metric("cache_hit", True)
+                        trace.finish("success")
+                        return cached
+                trace.set_metric("cache_hit", False)
 
-        # 1. Analyze query
-        analysis = self.analyzer.analyze(question)
-        logger.info(f"[RAG] Intent: {analysis.get('intent')}, Types: {analysis.get('data_types_needed')}")
+            # 1. Analyze query
+            with trace.step("analysis"):
+                analysis = self.analyzer.analyze(question)
+            logger.info(f"[RAG] Intent: {analysis.get('intent')}, Types: {analysis.get('data_types_needed')}")
+            trace.set_metric("intent", analysis.get("intent"))
+            trace.set_metric("data_types_needed", analysis.get("data_types_needed"))
 
-        # 2. Build filters
-        if filters is None:
-            filters = self.analyzer.build_filters(analysis) or None
+            # 2. Build filters
+            if filters is None:
+                with trace.step("filter_build"):
+                    filters = self.analyzer.build_filters(analysis) or None
+            trace.set_metric("filters", filters)
 
-        # 3. Wide retrieval: cast a bigger net (top_k * 4)
-        wide_k = max(top_k * 4, 20)
-        chunks = self.retriever.retrieve(
-            question=question,
-            top_k_text=wide_k // 3,
-            top_k_table=wide_k // 2,
-            top_k_image=wide_k // 6,
-            filters=filters,
-        )
-
-        if self._needs_image_analysis(analysis, question):
-            described_count = await asyncio.to_thread(self._describe_pending_images, chunks, 2)
-            if described_count:
-                logger.info(f"[RAG] Lazily described {described_count} image chunks; retrieving again")
+            # 3. Wide retrieval: cast a bigger net (top_k * 4)
+            wide_k = max(top_k * 4, 20)
+            with trace.step("retrieval"):
                 chunks = self.retriever.retrieve(
                     question=question,
                     top_k_text=wide_k // 3,
                     top_k_table=wide_k // 2,
-                    top_k_image=wide_k // 3,
+                    top_k_image=wide_k // 6,
                     filters=filters,
                 )
+            self._record_retrieval_metrics(trace, chunks, "retrieval")
 
-        if not chunks:
-            return {
-                "answer": "Không tìm thấy thông tin liên quan trong tài liệu.",
-                "sources": [],
+            image_lazy_triggered = self._needs_image_analysis(analysis, question)
+            trace.set_metric("image_lazy_triggered", image_lazy_triggered)
+            if image_lazy_triggered:
+                with trace.step("lazy_image"):
+                    described_count = await asyncio.to_thread(self._describe_pending_images, chunks, 2)
+                trace.set_metric("images_described", described_count)
+                if described_count:
+                    logger.info(f"[RAG] Lazily described {described_count} image chunks; retrieving again")
+                    with trace.step("retrieval_after_image"):
+                        chunks = self.retriever.retrieve(
+                            question=question,
+                            top_k_text=wide_k // 3,
+                            top_k_table=wide_k // 2,
+                            top_k_image=wide_k // 3,
+                            filters=filters,
+                        )
+                    self._record_retrieval_metrics(trace, chunks, "retrieval_after_image")
+            else:
+                trace.set_metric("images_described", 0)
+
+            if not chunks:
+                trace.finish("success")
+                return {
+                    "answer": "Không tìm thấy thông tin liên quan trong tài liệu.",
+                    "sources": [],
+                    "analysis": analysis,
+                }
+
+            # 4. Rerank: cross-encoder picks the best top_k from the wide set
+            # Run in thread to avoid blocking the async event loop (model.predict is CPU-bound)
+            with trace.step("rerank"):
+                chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
+            logger.info(f"[RAG] After rerank: {len(chunks)} chunks")
+            self._record_retrieval_metrics(trace, chunks, "rerank")
+
+            # 5. Build context
+            with trace.step("context_build"):
+                context = self.context_builder.build(chunks)
+                citations = self.context_builder.build_citations(chunks)
+            trace.set_metric("context_chars", len(context))
+            trace.set_metric("citations_count", len(citations))
+
+            # 6. LLM synthesis
+            with trace.step("generation"):
+                answer, usage = self._synthesize_with_usage(question, context)
+            trace.add_tokens("generation", usage)
+            estimated_cost = estimate_openai_cost_usd(
+                settings.llm_model,
+                usage.get("prompt_tokens", 0),
+                usage.get("completion_tokens", 0),
+            )
+            trace.add_cost("estimated_usd", estimated_cost)
+
+            result = {
+                "answer": answer,
+                "sources": citations,
                 "analysis": analysis,
             }
 
-        # 4. Rerank: cross-encoder picks the best top_k from the wide set
-        # Run in thread to avoid blocking the async event loop (model.predict is CPU-bound)
-        chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
-        logger.info(f"[RAG] After rerank: {len(chunks)} chunks")
+            # 7. Store in semantic cache for future queries
+            if self.cache:
+                with trace.step("cache_set"):
+                    self.cache.set(question, result)
 
-        # 5. Build context
-        context = self.context_builder.build(chunks)
-        citations = self.context_builder.build_citations(chunks)
-
-        # 6. LLM synthesis
-        answer = self._synthesize(question, context)
-
-        result = {
-            "answer": answer,
-            "sources": citations,
-            "analysis": analysis,
-        }
-
-        # 7. Store in semantic cache for future queries
-        if self.cache:
-            self.cache.set(question, result)
-
-        return result
+            trace.finish("success")
+            return result
+        except Exception as exc:
+            trace.finish("error", str(exc))
+            raise
+        finally:
+            self.trace_logger.write(trace.to_dict())
 
     def _needs_image_analysis(self, analysis: Dict[str, Any], question: str) -> bool:
         data_types = analysis.get("data_types_needed") or []
@@ -193,8 +240,29 @@ class RAGEngine:
 
         return len(updated_chunks)
 
+    def _record_retrieval_metrics(self, trace: RAGTrace, chunks: List[Dict[str, Any]], prefix: str) -> None:
+        source_counts = {"text": 0, "table": 0, "image": 0}
+        top_scores = []
+        for chunk in chunks:
+            source = chunk.get("source_collection", "text")
+            if source in source_counts:
+                source_counts[source] += 1
+            if "score" in chunk:
+                top_scores.append(round(float(chunk["score"]), 4))
+
+        trace.set_metric(f"{prefix}_chunks", len(chunks))
+        trace.set_metric(f"{prefix}_text_hits", source_counts["text"])
+        trace.set_metric(f"{prefix}_table_hits", source_counts["table"])
+        trace.set_metric(f"{prefix}_image_hits", source_counts["image"])
+        trace.set_metric(f"{prefix}_top_scores", top_scores[:5])
+
     def _synthesize(self, question: str, context: str) -> str:
         """Gọi LLM để generate answer từ context."""
+        answer, _usage = self._synthesize_with_usage(question, context)
+        return answer
+
+    def _synthesize_with_usage(self, question: str, context: str) -> tuple[str, Dict[str, int]]:
+        """Gọi LLM để generate answer từ context, kèm token usage."""
         user_message = f"""Context from financial documents:
 {context}
 
@@ -212,7 +280,7 @@ Please answer based on the context above. Cite sources using [Source #N] format.
             temperature=0.1,
             max_tokens=1500,
         )
-        return response.choices[0].message.content
+        return response.choices[0].message.content, openai_usage_to_dict(response)
 
     def _build_context(self, chunks: List[Dict]) -> str:
         """Legacy method — giữ để backward compat."""
@@ -229,41 +297,65 @@ Please answer based on the context above. Cite sources using [Source #N] format.
         """
         from typing import AsyncGenerator
 
-        analysis = self.analyzer.analyze(question)
-        if filters is None:
-            filters = self.analyzer.build_filters(analysis) or None
+        trace = RAGTrace(question=question)
+        try:
+            with trace.step("analysis"):
+                analysis = self.analyzer.analyze(question)
+            trace.set_metric("intent", analysis.get("intent"))
+            trace.set_metric("data_types_needed", analysis.get("data_types_needed"))
 
-        # Wide retrieval
-        wide_k = max(top_k * 4, 20)
-        chunks = self.retriever.retrieve(
-            question=question,
-            top_k_text=wide_k // 3,
-            top_k_table=wide_k // 2,
-            top_k_image=wide_k // 6,
-            filters=filters,
-        )
+            if filters is None:
+                with trace.step("filter_build"):
+                    filters = self.analyzer.build_filters(analysis) or None
+            trace.set_metric("filters", filters)
 
-        if self._needs_image_analysis(analysis, question):
-            described_count = await asyncio.to_thread(self._describe_pending_images, chunks, 2)
-            if described_count:
-                logger.info(f"[RAG] Lazily described {described_count} image chunks; retrieving again")
+            # Wide retrieval
+            wide_k = max(top_k * 4, 20)
+            with trace.step("retrieval"):
                 chunks = self.retriever.retrieve(
                     question=question,
                     top_k_text=wide_k // 3,
                     top_k_table=wide_k // 2,
-                    top_k_image=wide_k // 3,
+                    top_k_image=wide_k // 6,
                     filters=filters,
                 )
+            self._record_retrieval_metrics(trace, chunks, "retrieval")
 
-        if not chunks:
-            yield "Không tìm thấy thông tin liên quan trong tài liệu."
-            return
+            image_lazy_triggered = self._needs_image_analysis(analysis, question)
+            trace.set_metric("image_lazy_triggered", image_lazy_triggered)
+            if image_lazy_triggered:
+                with trace.step("lazy_image"):
+                    described_count = await asyncio.to_thread(self._describe_pending_images, chunks, 2)
+                trace.set_metric("images_described", described_count)
+                if described_count:
+                    logger.info(f"[RAG] Lazily described {described_count} image chunks; retrieving again")
+                    with trace.step("retrieval_after_image"):
+                        chunks = self.retriever.retrieve(
+                            question=question,
+                            top_k_text=wide_k // 3,
+                            top_k_table=wide_k // 2,
+                            top_k_image=wide_k // 3,
+                            filters=filters,
+                        )
+                    self._record_retrieval_metrics(trace, chunks, "retrieval_after_image")
+            else:
+                trace.set_metric("images_described", 0)
 
-        # Rerank (run in thread to avoid blocking event loop)
-        chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
+            if not chunks:
+                trace.finish("success")
+                yield "Không tìm thấy thông tin liên quan trong tài liệu."
+                return
 
-        context = self.context_builder.build(chunks)
-        user_message = f"""Context from financial documents:
+            # Rerank (run in thread to avoid blocking event loop)
+            with trace.step("rerank"):
+                chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
+            self._record_retrieval_metrics(trace, chunks, "rerank")
+
+            with trace.step("context_build"):
+                context = self.context_builder.build(chunks)
+            trace.set_metric("context_chars", len(context))
+
+            user_message = f"""Context from financial documents:
 {context}
 
 ---
@@ -271,17 +363,24 @@ Question: {question}
 
 Please answer based on the context above. Cite sources using [Source #N] format."""
 
-        stream = self.llm.chat.completions.create(
-            model=settings.llm_model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_message},
-            ],
-            temperature=0.1,
-            max_tokens=1500,
-            stream=True,
-        )
-        for chunk in stream:
-            delta = chunk.choices[0].delta.content
-            if delta:
-                yield delta
+            with trace.step("generation_stream"):
+                stream = self.llm.chat.completions.create(
+                    model=settings.llm_model,
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_message},
+                    ],
+                    temperature=0.1,
+                    max_tokens=1500,
+                    stream=True,
+                )
+                for chunk in stream:
+                    delta = chunk.choices[0].delta.content
+                    if delta:
+                        yield delta
+            trace.finish("success")
+        except Exception as exc:
+            trace.finish("error", str(exc))
+            raise
+        finally:
+            self.trace_logger.write(trace.to_dict())

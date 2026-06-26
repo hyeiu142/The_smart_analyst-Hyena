@@ -30,6 +30,7 @@ Docs/*.pdf
 .coverage
 htmlcov/
 *.log
+logs/
 
 # OS
 .DS_Store
