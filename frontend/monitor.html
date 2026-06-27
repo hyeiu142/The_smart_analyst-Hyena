@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyena Monitor</title>
+  <link rel="stylesheet" href="css/monitor.css" />
+</head>
+<body>
+  <header class="monitor-topbar">
+    <div>
+      <a href="/" class="brand">HYENA</a>
+      <span class="subtle">RAG Observability</span>
+    </div>
+    <div class="actions">
+      <select id="window-size" title="Request window">
+        <option value="50">Last 50</option>
+        <option value="100">Last 100</option>
+        <option value="200" selected>Last 200</option>
+        <option value="500">Last 500</option>
+      </select>
+      <button id="refresh-btn">Refresh</button>
+    </div>
+  </header>
+
+  <main class="monitor-layout">
+    <section class="kpi-grid" id="kpi-grid"></section>
+
+    <section class="split">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Step Latency</h2>
+          <span class="subtle">avg ms by RAG step</span>
+        </div>
+        <div id="step-chart" class="bar-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Latest Request</h2>
+          <span id="latest-status" class="status-pill">loading</span>
+        </div>
+        <div id="latest-request" class="latest-box"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Recent Requests</h2>
+        <span class="subtle">newest first</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Mode</th>
+              <th>Status</th>
+              <th>Latency</th>
+              <th>Slowest Step</th>
+              <th>Images</th>
+              <th>Cost</th>
+              <th>Question</th>
+            </tr>
+          </thead>
+          <tbody id="recent-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/monitor.js"></script>
+</body>
+</html>

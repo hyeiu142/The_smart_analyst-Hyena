@@ -88,9 +88,12 @@ class RAGEngine:
         """
         trace = RAGTrace(question=question, mode="query")
         try:
+            skip_cache = self._question_has_image_keywords(question)
+            trace.set_metric("cache_skipped", skip_cache)
+
             # 0. Check semantic cache first
             with trace.step("cache_lookup"):
-                if self.cache:
+                if self.cache and not skip_cache:
                     cached = self.cache.get(question)
                     if cached:
                         trace.set_metric("cache_hit", True)
@@ -151,12 +154,17 @@ class RAGEngine:
                     "analysis": analysis,
                 }
 
+            image_candidates = self._get_usable_image_candidates(chunks)
+
             # 4. Rerank: cross-encoder picks the best top_k from the wide set
             # Run in thread to avoid blocking the async event loop (model.predict is CPU-bound)
             with trace.step("rerank"):
                 chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
             logger.info(f"[RAG] After rerank: {len(chunks)} chunks")
             self._record_retrieval_metrics(trace, chunks, "rerank")
+            chunks = self._ensure_image_context(chunks, image_candidates, image_lazy_triggered, trace)
+            self._record_retrieval_metrics(trace, chunks, "context_selection")
+            self._record_selected_image_metrics(trace, chunks)
 
             # 5. Build context
             with trace.step("context_build"):
@@ -183,7 +191,7 @@ class RAGEngine:
             }
 
             # 7. Store in semantic cache for future queries
-            if self.cache:
+            if self.cache and not skip_cache:
                 with trace.step("cache_set"):
                     self.cache.set(question, result)
 
@@ -200,6 +208,9 @@ class RAGEngine:
         if "image" in {str(item).lower() for item in data_types}:
             return True
 
+        return self._question_has_image_keywords(question)
+
+    def _question_has_image_keywords(self, question: str) -> bool:
         normalized = question.lower()
         image_keywords = [
             "biểu đồ",
@@ -210,6 +221,8 @@ class RAGEngine:
             "yoy",
             "theo khối",
             "thị trường",
+            "diễn biến giá cổ phiếu",
+            "vn-index",
         ]
         return any(keyword in normalized for keyword in image_keywords)
 
@@ -255,6 +268,91 @@ class RAGEngine:
         trace.set_metric(f"{prefix}_table_hits", source_counts["table"])
         trace.set_metric(f"{prefix}_image_hits", source_counts["image"])
         trace.set_metric(f"{prefix}_top_scores", top_scores[:5])
+
+    def _get_usable_image_candidates(self, chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        candidates = [
+            chunk
+            for chunk in chunks
+            if chunk.get("source_collection") == "image"
+            and self._has_image_caption(chunk)
+        ]
+        return sorted(candidates, key=lambda chunk: float(chunk.get("score") or 0), reverse=True)
+
+    def _has_image_caption(self, chunk: Dict[str, Any]) -> bool:
+        metadata = chunk.get("metadata") or {}
+        content = (chunk.get("content") or "").strip()
+        if not content:
+            return False
+        if metadata.get("image_status") == "pending" or metadata.get("chunk_type") == "image_pending":
+            return False
+        if content.lower().startswith("pending chart/image crop"):
+            return False
+        return True
+
+    def _ensure_image_context(
+        self,
+        chunks: List[Dict[str, Any]],
+        image_candidates: List[Dict[str, Any]],
+        needs_image: bool,
+        trace: RAGTrace,
+    ) -> List[Dict[str, Any]]:
+        if not needs_image:
+            trace.set_metric("image_forced_into_context", False)
+            return chunks
+
+        selected_images = [
+            chunk
+            for chunk in chunks
+            if chunk.get("source_collection") == "image"
+            and self._has_image_caption(chunk)
+        ]
+        selected_ids = {chunk.get("id") for chunk in selected_images}
+
+        if not image_candidates:
+            trace.set_metric("image_forced_into_context", False)
+            trace.set_metric("image_force_reason", "no_usable_image_caption")
+            return chunks
+
+        added_images = []
+        for candidate in image_candidates:
+            candidate_id = candidate.get("id")
+            if candidate_id in selected_ids:
+                continue
+            selected_images.append(candidate)
+            added_images.append(candidate)
+            selected_ids.add(candidate_id)
+            if len(selected_images) >= 2:
+                break
+
+        trace.set_metric("image_forced_into_context", bool(added_images))
+        if added_images:
+            trace.set_metric(
+                "forced_image_scores",
+                [round(float(chunk.get("score") or 0), 4) for chunk in added_images],
+            )
+
+        non_image_chunks = [
+            chunk
+            for chunk in chunks
+            if chunk.get("source_collection") != "image"
+        ]
+        return selected_images + non_image_chunks
+
+    def _record_selected_image_metrics(self, trace: RAGTrace, chunks: List[Dict[str, Any]]) -> None:
+        selected_images = [
+            chunk
+            for chunk in chunks
+            if chunk.get("source_collection") == "image"
+        ]
+        trace.set_metric("selected_image_count", len(selected_images))
+        trace.set_metric(
+            "selected_image_paths",
+            [self._image_path_for_log(chunk) for chunk in selected_images],
+        )
+
+    def _image_path_for_log(self, chunk: Dict[str, Any]) -> str | None:
+        metadata = chunk.get("metadata") or {}
+        return metadata.get("image_path") or metadata.get("local_image_path")
 
     def _synthesize(self, question: str, context: str) -> str:
         """Gọi LLM để generate answer từ context."""
@@ -346,10 +444,15 @@ Please answer based on the context above. Cite sources using [Source #N] format.
                 yield "Không tìm thấy thông tin liên quan trong tài liệu."
                 return
 
+            image_candidates = self._get_usable_image_candidates(chunks)
+
             # Rerank (run in thread to avoid blocking event loop)
             with trace.step("rerank"):
                 chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
             self._record_retrieval_metrics(trace, chunks, "rerank")
+            chunks = self._ensure_image_context(chunks, image_candidates, image_lazy_triggered, trace)
+            self._record_retrieval_metrics(trace, chunks, "context_selection")
+            self._record_selected_image_metrics(trace, chunks)
 
             with trace.step("context_build"):
                 context = self.context_builder.build(chunks)

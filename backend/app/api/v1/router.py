@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from backend.app.api.v1 import health, documents, query
+from backend.app.api.v1 import health, documents, query, observability
 
 api_router = APIRouter()
 
@@ -20,4 +20,10 @@ api_router.include_router(
     query.router, 
     prefix="/query", 
     tags=["Query"]
+)
+
+api_router.include_router(
+    observability.router,
+    prefix="/observability",
+    tags=["Observability"],
 )
