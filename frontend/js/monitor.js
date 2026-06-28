@@ -1,4 +1,9 @@
 const API_BASE = '/api/v1';
+const EVAL_REPORT_PATH = '/eval-data/reports/retrieval_eval_20260620_234140.json';
+const TEST_SET_PATH = '/eval-data/test_sets/fpt_2025_qa_100.jsonl';
+
+let activeView = 'monitoring';
+let testCases = [];
 
 const formatMs = (value) => {
   const number = Number(value || 0);
@@ -19,6 +24,13 @@ const shortText = (value, max = 150) => {
   return text.length > max ? `${text.slice(0, max - 3)}...` : text;
 };
 
+const escapeHtml = (value) => String(value ?? '')
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#039;');
+
 const statusClass = (status) => {
   if (status === 'success') return 'status-success';
   if (status === 'error') return 'status-error';
@@ -29,6 +41,12 @@ async function fetchJson(path) {
   const res = await fetch(path);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
+}
+
+async function fetchText(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.text();
 }
 
 function renderKpis(summary) {
@@ -176,7 +194,7 @@ async function loadMonitor() {
 }
 
 document.getElementById('refresh-btn').addEventListener('click', () => {
-  loadMonitor().catch(showError);
+  loadActiveView();
 });
 
 document.getElementById('window-size').addEventListener('change', () => {
@@ -189,4 +207,240 @@ function showError(error) {
   document.getElementById('latest-request').innerHTML = `<div class="latest-question">${error.message}</div>`;
 }
 
-loadMonitor().catch(showError);
+function renderMetricBars(containerId, items) {
+  const container = document.getElementById(containerId);
+  if (!items.length) {
+    container.innerHTML = '<div class="subtle">Chưa có dữ liệu.</div>';
+    return;
+  }
+
+  container.innerHTML = items.map(item => `
+    <div class="bar-row">
+      <div class="bar-name">${escapeHtml(item.label)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2, item.value * 100)}%"></div></div>
+      <div class="bar-value">${(item.value * 100).toFixed(1)}%</div>
+    </div>
+  `).join('');
+}
+
+function renderEvaluation(report) {
+  const summary = report.summary || {};
+  const total = Number(summary.total || 0);
+  const cards = [
+    { label: 'Total cases', value: total, foot: 'retrieval baseline' },
+    { label: 'Passed', value: summary.passed || 0, foot: `${summary.failed || 0} failed` },
+    { label: 'Pass rate', value: formatPercent((summary.pass_rate || 0) * 100), foot: 'all categories' },
+    { label: 'Page hit', value: formatPercent((summary.check_rates?.page_hit || 0) * 100), foot: 'expected page retrieved' },
+  ];
+
+  document.getElementById('eval-kpis').innerHTML = cards.map(card => `
+    <article class="kpi-card">
+      <div class="kpi-label">${card.label}</div>
+      <div class="kpi-value">${card.value}</div>
+      <div class="kpi-foot">${card.foot}</div>
+    </article>
+  `).join('');
+
+  document.getElementById('eval-run-time').textContent = report.created_at
+    ? `run ${report.created_at}`
+    : '';
+
+  const categories = Object.entries(summary.by_category || {}).map(([label, value]) => ({
+    label,
+    value: Number(value.pass_rate || 0),
+  }));
+  renderMetricBars('eval-category-chart', categories);
+
+  const checks = Object.entries(summary.check_rates || {}).map(([label, value]) => ({
+    label: label.replaceAll('_', ' '),
+    value: Number(value || 0),
+  }));
+  renderMetricBars('eval-check-chart', checks);
+
+  const failures = (report.results || []).filter(item => !item.passed);
+  document.getElementById('eval-failure-count').textContent = failures.length;
+  document.getElementById('eval-failures').innerHTML = failures.length
+    ? failures.map(renderFailureCard).join('')
+    : '<div class="subtle">Không có case thất bại.</div>';
+}
+
+function renderFailureCard(item) {
+  const failedChecks = Object.entries(item.checks || {})
+    .filter(([, passed]) => !passed)
+    .map(([name]) => name.replaceAll('_', ' '));
+  const expected = item.expected || {};
+  const topResult = (item.top_results || [])[0];
+
+  return `
+    <details class="case-card">
+      <summary>
+        <span class="case-id">${escapeHtml(item.id)}</span>
+        <span class="case-question">${escapeHtml(item.question)}</span>
+        <span class="case-tags">
+          <span class="tag">${escapeHtml(item.category)}</span>
+          ${failedChecks.map(check => `<span class="tag status-error">${escapeHtml(check)}</span>`).join('')}
+        </span>
+      </summary>
+      <div class="case-details">
+        <div class="detail-block">
+          <div class="detail-title">Expected</div>
+          <div class="detail-content">
+            Pages: ${escapeHtml((expected.pages || []).join(', ') || '—')}<br>
+            Types: ${escapeHtml((expected.chunk_types || []).join(', ') || '—')}<br>
+            Numbers: ${escapeHtml((expected.numbers || []).join(', ') || '—')}
+          </div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-title">Top retrieved result</div>
+          <div class="detail-content">
+            ${topResult
+              ? `Page ${escapeHtml(topResult.page ?? '—')} · ${escapeHtml(topResult.chunk_type || '—')} · score ${escapeHtml(topResult.score ?? '—')}<br>${escapeHtml(topResult.preview || '')}`
+              : 'Không có kết quả retrieval.'}
+          </div>
+        </div>
+      </div>
+    </details>
+  `;
+}
+
+async function loadEvaluation() {
+  renderEvaluation(await fetchJson(EVAL_REPORT_PATH));
+}
+
+function parseJsonl(text) {
+  return text.split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      try {
+        return JSON.parse(line);
+      } catch (error) {
+        throw new Error(`JSONL không hợp lệ tại dòng ${index + 1}: ${error.message}`);
+      }
+    });
+}
+
+function renderTestSummary(rows) {
+  const categoryCount = rows.reduce((counts, row) => {
+    counts[row.category] = (counts[row.category] || 0) + 1;
+    return counts;
+  }, {});
+  const cards = [
+    { label: 'Total', value: rows.length, foot: 'test cases' },
+    { label: 'Text', value: categoryCount.text || 0, foot: 'text evidence' },
+    { label: 'Table', value: categoryCount.table || 0, foot: 'table evidence' },
+    { label: 'Image', value: categoryCount.image || 0, foot: 'chart evidence' },
+    { label: 'Mixed / No answer', value: `${categoryCount.mixed || 0} / ${categoryCount.unanswerable || 0}`, foot: 'cross-source / refusal' },
+  ];
+
+  document.getElementById('test-kpis').innerHTML = cards.map(card => `
+    <article class="kpi-card">
+      <div class="kpi-label">${card.label}</div>
+      <div class="kpi-value">${card.value}</div>
+      <div class="kpi-foot">${card.foot}</div>
+    </article>
+  `).join('');
+}
+
+function populateFilter(id, values) {
+  const select = document.getElementById(id);
+  const current = select.value;
+  const firstOption = select.options[0].outerHTML;
+  select.innerHTML = firstOption + values
+    .map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)
+    .join('');
+  select.value = current;
+}
+
+function renderTestCard(item) {
+  return `
+    <details class="case-card">
+      <summary>
+        <span class="case-id">${escapeHtml(item.id)}</span>
+        <span class="case-question">${escapeHtml(item.question)}</span>
+        <span class="case-tags">
+          <span class="tag">${escapeHtml(item.category)}</span>
+          <span class="tag">${escapeHtml(item.difficulty)}</span>
+          <span class="tag ${item.answerable ? 'status-success' : 'status-warn'}">${item.answerable ? 'answerable' : 'no answer'}</span>
+          <span class="tag">page ${escapeHtml((item.expected_pages || []).join(', ') || '—')}</span>
+        </span>
+      </summary>
+      <div class="case-details">
+        <div class="detail-block">
+          <div class="detail-title">Ground truth answer</div>
+          <div class="detail-content">${escapeHtml(item.ground_truth_answer)}</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-title">Evidence</div>
+          <div class="detail-content">${escapeHtml(item.evidence)}</div>
+        </div>
+      </div>
+    </details>
+  `;
+}
+
+function filterTestCases() {
+  const query = document.getElementById('test-search').value.trim().toLowerCase();
+  const category = document.getElementById('test-category').value;
+  const difficulty = document.getElementById('test-difficulty').value;
+  const answerable = document.getElementById('test-answerable').value;
+
+  const visible = testCases.filter(item => {
+    const searchable = `${item.id} ${item.question} ${item.ground_truth_answer} ${item.evidence}`.toLowerCase();
+    return (!query || searchable.includes(query))
+      && (!category || item.category === category)
+      && (!difficulty || item.difficulty === difficulty)
+      && (!answerable || String(item.answerable) === answerable);
+  });
+
+  document.getElementById('test-visible-count').textContent = `${visible.length}/${testCases.length} câu`;
+  document.getElementById('test-cases').innerHTML = visible.length
+    ? visible.map(renderTestCard).join('')
+    : '<div class="subtle">Không tìm thấy câu phù hợp.</div>';
+}
+
+async function loadTestSet() {
+  if (!testCases.length) {
+    testCases = parseJsonl(await fetchText(TEST_SET_PATH));
+    renderTestSummary(testCases);
+    populateFilter('test-category', [...new Set(testCases.map(item => item.category))].sort());
+    populateFilter('test-difficulty', [...new Set(testCases.map(item => item.difficulty))].sort());
+  }
+  filterTestCases();
+}
+
+async function loadActiveView() {
+  try {
+    if (activeView === 'monitoring') await loadMonitor();
+    if (activeView === 'evaluation') await loadEvaluation();
+    if (activeView === 'test-set') await loadTestSet();
+  } catch (error) {
+    if (activeView === 'monitoring') showError(error);
+    else {
+      const target = activeView === 'evaluation' ? 'eval-failures' : 'test-cases';
+      document.getElementById(target).innerHTML = `<div class="latest-question">${escapeHtml(error.message)}</div>`;
+    }
+  }
+}
+
+function switchView(view) {
+  activeView = view;
+  document.querySelectorAll('.workspace-view').forEach(element => element.classList.add('hidden'));
+  document.querySelectorAll('.workspace-tab').forEach(element => element.classList.remove('active'));
+  document.getElementById(`view-${view}`).classList.remove('hidden');
+  document.querySelector(`[data-view="${view}"]`).classList.add('active');
+  window.location.hash = view;
+  loadActiveView();
+}
+
+document.querySelectorAll('.workspace-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchView(tab.dataset.view));
+});
+
+['test-search', 'test-category', 'test-difficulty', 'test-answerable'].forEach(id => {
+  document.getElementById(id).addEventListener(id === 'test-search' ? 'input' : 'change', filterTestCases);
+});
+
+const initialView = window.location.hash.slice(1);
+const validViews = ['monitoring', 'evaluation', 'test-set', 'traces', 'documents'];
+switchView(validViews.includes(initialView) ? initialView : 'monitoring');

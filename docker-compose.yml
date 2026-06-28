@@ -72,6 +72,8 @@ services:
     container_name: hyena-frontend
     ports:
       - "80:80"
+    volumes:
+      - ./eval:/usr/share/nginx/html/eval-data:ro
     depends_on:
       - backend
     restart: unless-stopped
