@@ -17,9 +17,16 @@ You are acting as an expert financial data analyst. You are analyzing a chart, g
 Please extract the maximum amount of detail possible to ensure accurate semantic search later.
 
 Provide the following:
-1. "caption": A highly detailed paragraph (not just 1-2 sentences) describing exactly what the chart illustrates. Include the axes, units, timeframes, and the overall context (e.g., "This dual-axis chart illustrates the ICT Revenue in billions USD alongside the YoY growth percentage from 2018 to 2025E...").
+1. "caption": A highly detailed paragraph (not just 1-2 sentences) describing exactly what the chart illustrates. Include the original visible title, axes, units, timeframes, legend labels, and the overall context. Preserve Vietnamese labels exactly when visible, then add English explanations if useful.
 2. "key_data": Extract ALL visible data points, numbers, and categories into a well-formatted Markdown Table. After the table, list 2-3 key analytical insights (peaks, major drops, notable trends).
 3. "chart_type": (bar_chart, line_chart, pie_chart, table_image, diagram, other).
+
+Important accuracy rules:
+- Do NOT infer or invent values. If a value is not visible, write "not visible" instead of 0.
+- For stacked bar charts, map each colored segment using the legend exactly. Read the segment label printed inside that color block.
+- Pay special attention to the latest year/rightmost bar and preserve decimal separators exactly (e.g. 23.1% vs 23,1%).
+- If the chart title or legend is in Vietnamese, include those Vietnamese words in the caption/key_data so Vietnamese retrieval queries can match the chart.
+- Never shift values between legend categories. For example, if red is "Mỹ", the red label belongs to "Mỹ" only.
 
 Respond EXACTLY in this JSON format:
 {
@@ -275,7 +282,7 @@ class ImageProcessor:
             base64_image = base64.b64encode(image_bytes).decode('utf-8')
             
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=settings.vision_model,
                 messages=[
                     {
                         "role": "user",
@@ -290,7 +297,8 @@ class ImageProcessor:
                         ]
                     }
                 ],
-                max_tokens=800
+                temperature=0,
+                max_tokens=1200
             )
             
             text = response.choices[0].message.content.strip()

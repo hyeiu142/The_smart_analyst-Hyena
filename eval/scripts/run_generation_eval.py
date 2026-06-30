@@ -238,7 +238,9 @@ def deterministic_judge(
 ) -> dict[str, Any]:
     if not case.get("answerable", True):
         refusal = is_refusal(answer)
-        hallucinated_numbers = bool(extract_numbers(answer))
+        question_numbers = set(extract_numbers(case.get("question", "")))
+        answer_numbers = set(extract_numbers(answer))
+        hallucinated_numbers = bool(answer_numbers - question_numbers)
         passed = refusal and not hallucinated_numbers
         return {
             "mode": "deterministic",

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     embedding_model: str = "text-embedding-3-small"
     llm_model: str = "gpt-4o-mini"
+    vision_model: str = "gpt-4o"
 
     chunk_size: int = 1024
     chunk_overlap: int = 200

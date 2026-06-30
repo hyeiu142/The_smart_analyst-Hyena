@@ -53,6 +53,12 @@ async def query(request: QueryRequest):
         result = await rag_engine.query(
             question=request.question,
             top_k=request.top_k,
+            top_k_text=request.top_k_text,
+            top_k_table=request.top_k_table,
+            top_k_image=request.top_k_image,
+            reranker=request.reranker,
+            reranker_model=request.reranker_model,
+            cross_encoder_top_n=request.cross_encoder_top_n,
             filters=filters,
         )
         return QueryResponse(
@@ -83,6 +89,12 @@ async def query_stream(request: QueryRequest):
             async for event in rag_engine.stream_query(
                 question=request.question,
                 top_k=request.top_k,
+                top_k_text=request.top_k_text,
+                top_k_table=request.top_k_table,
+                top_k_image=request.top_k_image,
+                reranker=request.reranker,
+                reranker_model=request.reranker_model,
+                cross_encoder_top_n=request.cross_encoder_top_n,
                 filters=filters,
             ):
                 payload = event if isinstance(event, dict) else {"token": event}

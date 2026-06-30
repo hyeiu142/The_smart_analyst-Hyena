@@ -52,11 +52,12 @@ def test_deterministic_judge_fails_wrong_number() -> None:
 def test_unanswerable_refusal_passes_without_hallucinated_number() -> None:
     case = {
         "answerable": False,
+        "question": "Kế hoạch lợi nhuận trước thuế năm 2026 là bao nhiêu?",
         "ground_truth_answer": "Không có thông tin.",
         "expected_pages": [],
         "expected_chunk_types": [],
     }
-    answer = "Không có thông tin trong tài liệu đã cho."
+    answer = "Không có thông tin về kế hoạch lợi nhuận trước thuế năm 2026 trong tài liệu đã cho."
 
     result = deterministic_judge(case, answer, [])
 

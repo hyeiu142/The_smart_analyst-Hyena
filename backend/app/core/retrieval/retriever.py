@@ -1,6 +1,10 @@
 from typing import Any, Dict, List, Optional
 from backend.app.core.retrieval.embedder import Embedder
 from backend.app.core.retrieval.qdrant_client import QdrantClientWrapper
+from backend.app.core.retrieval.reranker import (
+    get_cross_encoder_reranker,
+    rerank_chunks,
+)
 
 class MultiCollectionRetriever: 
     """
@@ -19,7 +23,9 @@ class MultiCollectionRetriever:
         top_k_table: int = 5,
         top_k_image: int = 2, 
         filters: Optional[Dict] = None, 
-
+        reranker: str = "vector",
+        reranker_model: Optional[str] = None,
+        cross_encoder_top_n: int = 12,
     ) -> List[Dict[str, Any]]:
         """
         Search 3 collections at the same time, merge all results
@@ -39,14 +45,19 @@ class MultiCollectionRetriever:
         query_vector = self.embedder.embed_documents(question)
         qdrant_filters = self._build_filter(filters) if filters else None
 
-        
-        table_results = self.qdrant.search(
+        text_results = self._search_collection(
+            collection_name=self.qdrant.TEXT_COLLECTION,
+            query_vector=query_vector,
+            limit=top_k_text,
+            filters=qdrant_filters,
+        )
+        table_results = self._search_collection(
             collection_name=self.qdrant.TABLE_COLLECTION,
             query_vector=query_vector,
             limit=top_k_table,
             filters=qdrant_filters,
         )
-        image_results = self.qdrant.search(
+        image_results = self._search_collection(
             collection_name=self.qdrant.IMAGE_COLLECTION,
             query_vector=query_vector,
             limit=top_k_image,
@@ -63,7 +74,40 @@ class MultiCollectionRetriever:
         all_results = text_results + table_results + image_results
         all_results.sort(key=lambda x: x["score"], reverse=True)
 
+        if reranker == "heuristic":
+            return rerank_chunks(question, all_results)
+
+        if reranker == "cross_encoder":
+            model_name = reranker_model or "cross-encoder/ms-marco-MiniLM-L-6-v2"
+            preranked = rerank_chunks(question, all_results)
+            model_candidates = preranked[:cross_encoder_top_n]
+            remaining = preranked[cross_encoder_top_n:]
+            reranked = get_cross_encoder_reranker(model_name).rerank(
+                question,
+                model_candidates,
+                top_n=len(model_candidates),
+                force=True,
+            )
+            return reranked + remaining
+
         return all_results
+
+    def _search_collection(
+        self,
+        *,
+        collection_name: str,
+        query_vector: list[float],
+        limit: int,
+        filters: Any,
+    ) -> List[Dict[str, Any]]:
+        if limit <= 0:
+            return []
+        return self.qdrant.search(
+            collection_name=collection_name,
+            query_vector=query_vector,
+            limit=limit,
+            filters=filters,
+        )
     
     def _build_filter(self, filters: Dict) -> Dict:
         """
@@ -83,5 +127,3 @@ class MultiCollectionRetriever:
                 )
             )
         return Filter(must=conditions)
-
-

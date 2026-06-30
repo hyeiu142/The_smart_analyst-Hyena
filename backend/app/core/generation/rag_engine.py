@@ -6,7 +6,6 @@ from openai import OpenAI
 
 from backend.app.config import get_settings
 from backend.app.core.retrieval.retriever import MultiCollectionRetriever
-from backend.app.core.retrieval.reranker import CrossEncoderReranker
 from backend.app.core.retrieval.embedder import Embedder
 from backend.app.core.cache.semantic_cache import SemanticCache
 from backend.app.core.generation.query_analyzer import QueryAnalyzer
@@ -44,7 +43,6 @@ class RAGEngine:
     def __init__(self):
         self.llm = OpenAI(api_key=settings.openai_api_key)
         self.retriever = MultiCollectionRetriever()
-        self.reranker = CrossEncoderReranker()  # lazy-loads on first query
         self.embedder = Embedder()
         self.analyzer = QueryAnalyzer()
         self.context_builder = ContextBuilder()
@@ -69,6 +67,12 @@ class RAGEngine:
         self,
         question: str,
         top_k: int = 5,
+        top_k_text: Optional[int] = None,
+        top_k_table: Optional[int] = None,
+        top_k_image: Optional[int] = None,
+        reranker: str = "cross_encoder",
+        reranker_model: Optional[str] = None,
+        cross_encoder_top_n: int = 12,
         filters: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """
@@ -114,15 +118,39 @@ class RAGEngine:
                     filters = self.analyzer.build_filters(analysis) or None
             trace.set_metric("filters", filters)
 
-            # 3. Wide retrieval: cast a bigger net (top_k * 4)
-            wide_k = max(top_k * 4, 20)
+            retrieval_top_k_text, retrieval_top_k_table, retrieval_top_k_image = (
+                self._build_retrieval_allocation(
+                    top_k=top_k,
+                    top_k_text=top_k_text,
+                    top_k_table=top_k_table,
+                    top_k_image=top_k_image,
+                )
+            )
+            trace.set_metric(
+                "retrieval_config",
+                {
+                    "top_k": top_k,
+                    "top_k_text": retrieval_top_k_text,
+                    "top_k_table": retrieval_top_k_table,
+                    "top_k_image": retrieval_top_k_image,
+                    "reranker": reranker,
+                    "reranker_model": reranker_model,
+                    "cross_encoder_top_n": cross_encoder_top_n,
+                },
+            )
+
+            # 3. Retrieval: explicit allocation is used for eval/experiments;
+            # otherwise keep the previous wide retrieval behavior.
             with trace.step("retrieval"):
                 chunks = self.retriever.retrieve(
                     question=question,
-                    top_k_text=wide_k // 3,
-                    top_k_table=wide_k // 2,
-                    top_k_image=wide_k // 6,
+                    top_k_text=retrieval_top_k_text,
+                    top_k_table=retrieval_top_k_table,
+                    top_k_image=retrieval_top_k_image,
                     filters=filters,
+                    reranker=reranker,
+                    reranker_model=reranker_model,
+                    cross_encoder_top_n=cross_encoder_top_n,
                 )
             self._record_retrieval_metrics(trace, chunks, "retrieval")
 
@@ -137,10 +165,13 @@ class RAGEngine:
                     with trace.step("retrieval_after_image"):
                         chunks = self.retriever.retrieve(
                             question=question,
-                            top_k_text=wide_k // 3,
-                            top_k_table=wide_k // 2,
-                            top_k_image=wide_k // 3,
+                            top_k_text=retrieval_top_k_text,
+                            top_k_table=retrieval_top_k_table,
+                            top_k_image=max(retrieval_top_k_image, top_k),
                             filters=filters,
+                            reranker=reranker,
+                            reranker_model=reranker_model,
+                            cross_encoder_top_n=cross_encoder_top_n,
                         )
                     self._record_retrieval_metrics(trace, chunks, "retrieval_after_image")
             else:
@@ -156,11 +187,11 @@ class RAGEngine:
 
             image_candidates = self._get_usable_image_candidates(chunks)
 
-            # 4. Rerank: cross-encoder picks the best top_k from the wide set
-            # Run in thread to avoid blocking the async event loop (model.predict is CPU-bound)
+            # 4. Select final context chunks. retrieve() already applies the
+            # requested reranker mode, so avoid a second rerank here.
             with trace.step("rerank"):
-                chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
-            logger.info(f"[RAG] After rerank: {len(chunks)} chunks")
+                chunks = chunks[:top_k]
+            logger.info(f"[RAG] After context selection: {len(chunks)} chunks")
             self._record_retrieval_metrics(trace, chunks, "rerank")
             chunks = self._ensure_image_context(chunks, image_candidates, image_lazy_triggered, trace)
             self._record_retrieval_metrics(trace, chunks, "context_selection")
@@ -225,6 +256,28 @@ class RAGEngine:
             "vn-index",
         ]
         return any(keyword in normalized for keyword in image_keywords)
+
+    def _build_retrieval_allocation(
+        self,
+        *,
+        top_k: int,
+        top_k_text: Optional[int],
+        top_k_table: Optional[int],
+        top_k_image: Optional[int],
+    ) -> tuple[int, int, int]:
+        if (
+            top_k_text is not None
+            or top_k_table is not None
+            or top_k_image is not None
+        ):
+            return (
+                max(0, top_k_text or 0),
+                max(0, top_k_table or 0),
+                max(0, top_k_image or 0),
+            )
+
+        wide_k = max(top_k * 4, 20)
+        return wide_k // 3, wide_k // 2, wide_k // 6
 
     def _describe_pending_images(self, chunks: List[Dict[str, Any]], max_images: int = 2) -> int:
         pending_images = [
@@ -388,6 +441,12 @@ Please answer based on the context above. Cite sources using [Source #N] format.
         self,
         question: str,
         top_k: int = 5,
+        top_k_text: Optional[int] = None,
+        top_k_table: Optional[int] = None,
+        top_k_image: Optional[int] = None,
+        reranker: str = "cross_encoder",
+        reranker_model: Optional[str] = None,
+        cross_encoder_top_n: int = 12,
         filters: Optional[Dict] = None,
     ):
         """
@@ -407,15 +466,37 @@ Please answer based on the context above. Cite sources using [Source #N] format.
                     filters = self.analyzer.build_filters(analysis) or None
             trace.set_metric("filters", filters)
 
-            # Wide retrieval
-            wide_k = max(top_k * 4, 20)
+            retrieval_top_k_text, retrieval_top_k_table, retrieval_top_k_image = (
+                self._build_retrieval_allocation(
+                    top_k=top_k,
+                    top_k_text=top_k_text,
+                    top_k_table=top_k_table,
+                    top_k_image=top_k_image,
+                )
+            )
+            trace.set_metric(
+                "retrieval_config",
+                {
+                    "top_k": top_k,
+                    "top_k_text": retrieval_top_k_text,
+                    "top_k_table": retrieval_top_k_table,
+                    "top_k_image": retrieval_top_k_image,
+                    "reranker": reranker,
+                    "reranker_model": reranker_model,
+                    "cross_encoder_top_n": cross_encoder_top_n,
+                },
+            )
+
             with trace.step("retrieval"):
                 chunks = self.retriever.retrieve(
                     question=question,
-                    top_k_text=wide_k // 3,
-                    top_k_table=wide_k // 2,
-                    top_k_image=wide_k // 6,
+                    top_k_text=retrieval_top_k_text,
+                    top_k_table=retrieval_top_k_table,
+                    top_k_image=retrieval_top_k_image,
                     filters=filters,
+                    reranker=reranker,
+                    reranker_model=reranker_model,
+                    cross_encoder_top_n=cross_encoder_top_n,
                 )
             self._record_retrieval_metrics(trace, chunks, "retrieval")
 
@@ -430,10 +511,13 @@ Please answer based on the context above. Cite sources using [Source #N] format.
                     with trace.step("retrieval_after_image"):
                         chunks = self.retriever.retrieve(
                             question=question,
-                            top_k_text=wide_k // 3,
-                            top_k_table=wide_k // 2,
-                            top_k_image=wide_k // 3,
+                            top_k_text=retrieval_top_k_text,
+                            top_k_table=retrieval_top_k_table,
+                            top_k_image=max(retrieval_top_k_image, top_k),
                             filters=filters,
+                            reranker=reranker,
+                            reranker_model=reranker_model,
+                            cross_encoder_top_n=cross_encoder_top_n,
                         )
                     self._record_retrieval_metrics(trace, chunks, "retrieval_after_image")
             else:
@@ -446,9 +530,8 @@ Please answer based on the context above. Cite sources using [Source #N] format.
 
             image_candidates = self._get_usable_image_candidates(chunks)
 
-            # Rerank (run in thread to avoid blocking event loop)
             with trace.step("rerank"):
-                chunks = await asyncio.to_thread(self.reranker.rerank, question, chunks, top_k)
+                chunks = chunks[:top_k]
             self._record_retrieval_metrics(trace, chunks, "rerank")
             chunks = self._ensure_image_context(chunks, image_candidates, image_lazy_triggered, trace)
             self._record_retrieval_metrics(trace, chunks, "context_selection")
