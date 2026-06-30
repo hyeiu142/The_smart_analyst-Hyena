@@ -1,4 +1,5 @@
 from eval.scripts.run_generation_eval import (
+    contains_number,
     deterministic_judge,
     get_expected_terms,
     summarize,
@@ -49,6 +50,12 @@ def test_deterministic_judge_fails_wrong_number() -> None:
     assert result["reason"] == "answer_term_mismatch"
 
 
+def test_contains_number_allows_small_ocr_rounding_difference() -> None:
+    assert contains_number("Doanh thu 19,508 tỷ VND", "19.507")
+    assert contains_number("Tiền mặt 10,541 tỷ VND", "10.540")
+    assert not contains_number("Doanh thu 30% doanh thu", "28%")
+
+
 def test_unanswerable_refusal_passes_without_hallucinated_number() -> None:
     case = {
         "answerable": False,
@@ -58,6 +65,24 @@ def test_unanswerable_refusal_passes_without_hallucinated_number() -> None:
         "expected_chunk_types": [],
     }
     answer = "Không có thông tin về kế hoạch lợi nhuận trước thuế năm 2026 trong tài liệu đã cho."
+
+    result = deterministic_judge(case, answer, [])
+
+    assert result["passed"] is True
+
+
+def test_unanswerable_refusal_allows_contextual_dates() -> None:
+    case = {
+        "answerable": False,
+        "question": "FPT đã trả bao nhiêu tiền để sở hữu bản quyền Ngoại hạng Anh?",
+        "ground_truth_answer": "Không công bố giá trị mua bản quyền.",
+        "expected_pages": [],
+        "expected_chunk_types": [],
+    }
+    answer = (
+        "Tài liệu không cung cấp số tiền FPT đã trả. Tài liệu chỉ nêu "
+        "giai đoạn phát sóng 2025-2026 đến 2030-2031."
+    )
 
     result = deterministic_judge(case, answer, [])
 

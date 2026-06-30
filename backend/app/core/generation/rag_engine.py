@@ -73,6 +73,7 @@ class RAGEngine:
         reranker: str = "cross_encoder",
         reranker_model: Optional[str] = None,
         cross_encoder_top_n: int = 12,
+        use_cache: bool = True,
         filters: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """
@@ -92,7 +93,7 @@ class RAGEngine:
         """
         trace = RAGTrace(question=question, mode="query")
         try:
-            skip_cache = self._question_has_image_keywords(question)
+            skip_cache = (not use_cache) or self._question_has_image_keywords(question)
             trace.set_metric("cache_skipped", skip_cache)
 
             # 0. Check semantic cache first
@@ -447,6 +448,7 @@ Please answer based on the context above. Cite sources using [Source #N] format.
         reranker: str = "cross_encoder",
         reranker_model: Optional[str] = None,
         cross_encoder_top_n: int = 12,
+        use_cache: bool = True,
         filters: Optional[Dict] = None,
     ):
         """

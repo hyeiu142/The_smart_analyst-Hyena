@@ -14,6 +14,7 @@ from urllib.request import Request, urlopen
 
 REFUSAL_PATTERNS = [
     "không có thông tin",
+    "không cung cấp",
     "không được cung cấp",
     "không tìm thấy",
     "không thể",
@@ -127,10 +128,42 @@ def extract_numbers(text: str) -> list[str]:
 def contains_number(text: str, expected_number: str) -> bool:
     normalized_text = normalize_text(text)
     normalized_number_text = normalize_number(text)
-    return any(
+    if any(
         variant in normalized_text or variant in normalized_number_text
         for variant in number_variants(expected_number)
-    )
+    ):
+        return True
+
+    expected = parse_number(expected_number)
+    if expected is None:
+        return False
+
+    for candidate in extract_numbers(text):
+        parsed = parse_number(candidate)
+        if parsed is None:
+            continue
+        tolerance = 0.01 if abs(expected) < 100 else 1.0
+        if abs(parsed - expected) <= tolerance:
+            return True
+
+    return False
+
+
+def parse_number(value: str) -> float | None:
+    raw = normalize_text(value)
+    if not any(character.isdigit() for character in raw):
+        return None
+
+    raw = raw.replace("%", "")
+    if "," in raw and "." in raw:
+        raw = raw.replace(",", "")
+    elif "," in raw:
+        raw = raw.replace(",", ".")
+
+    try:
+        return float(raw)
+    except ValueError:
+        return None
 
 
 def contains_term(text: str, expected_term: str) -> bool:
@@ -240,7 +273,14 @@ def deterministic_judge(
         refusal = is_refusal(answer)
         question_numbers = set(extract_numbers(case.get("question", "")))
         answer_numbers = set(extract_numbers(answer))
-        hallucinated_numbers = bool(answer_numbers - question_numbers)
+        extra_numbers = answer_numbers - question_numbers
+        money_or_target_claim = bool(
+            re.search(
+                r"(\d+(?:[.,]\d+)?)\s*(tỷ|triệu|usd|vnd|đồng|nghìn|k|mục tiêu|giá mục tiêu)",
+                normalize_text(answer),
+            )
+        )
+        hallucinated_numbers = bool(extra_numbers) and money_or_target_claim
         passed = refusal and not hallucinated_numbers
         return {
             "mode": "deterministic",
@@ -426,6 +466,7 @@ def build_payload(case: dict[str, Any], args: argparse.Namespace) -> dict[str, A
     payload: dict[str, Any] = {
         "question": case["question"],
         "top_k": args.top_k,
+        "use_cache": False,
         "company": case.get("company"),
         "year": case.get("year"),
         "quarter": case.get("quarter"),

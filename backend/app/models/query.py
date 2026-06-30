@@ -11,6 +11,7 @@ class QueryRequest(BaseModel):
     reranker: str = "heuristic"
     reranker_model: Optional[str] = None
     cross_encoder_top_n: int = 12
+    use_cache: bool = True
 
     company: Optional[str] = None
     year: Optional[int] = None

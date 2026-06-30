@@ -59,6 +59,7 @@ async def query(request: QueryRequest):
             reranker=request.reranker,
             reranker_model=request.reranker_model,
             cross_encoder_top_n=request.cross_encoder_top_n,
+            use_cache=request.use_cache,
             filters=filters,
         )
         return QueryResponse(
@@ -95,6 +96,7 @@ async def query_stream(request: QueryRequest):
                 reranker=request.reranker,
                 reranker_model=request.reranker_model,
                 cross_encoder_top_n=request.cross_encoder_top_n,
+                use_cache=request.use_cache,
                 filters=filters,
             ):
                 payload = event if isinstance(event, dict) else {"token": event}
@@ -156,6 +158,7 @@ async def find_similar(request: QueryRequest):
                 "reranker": request.reranker,
                 "reranker_model": request.reranker_model,
                 "cross_encoder_top_n": request.cross_encoder_top_n,
+                "use_cache": request.use_cache,
                 "filters": filters,
             },
             "results": chunks,
