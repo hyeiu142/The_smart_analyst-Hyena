@@ -6,9 +6,9 @@ from typing import Any, Dict, List
 
 import httpx
 from openai import OpenAI
-from llama_parse import LlamaParse
 
 from backend.app.config import get_settings
+from backend.app.core.ingestion.doclayout_detector import DocLayoutFigureDetector
 
 settings = get_settings()
 
@@ -41,14 +41,8 @@ class ImageProcessor:
     """
 
     def __init__(self):
-        self.parser = LlamaParse(
-            api_key=settings.llama_cloud_api_key,
-            result_type="markdown",
-            language="vi",
-            verbose=False,
-            extract_images=True,
-        )
         self.openai_client = OpenAI(api_key=settings.openai_api_key)
+        self.figure_detector = DocLayoutFigureDetector()
 
     async def process(
         self,
@@ -56,48 +50,25 @@ class ImageProcessor:
         metadata: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """
-        Extract images via LlamaParse and store lightweight placeholders.
-
-        LlamaParse flow:
-        1. aget_json() → parse result with image names/references
-        2. get_images(json_result, download_path) → download images to disk
-        3. Store pending image chunks; expensive vision captioning is done lazily at query time
+        Detect chart regions with DocLayout-YOLO, caption each crop, and create
+        searchable image chunks during ingestion.
         """
-        # Step 1: parse
-        json_result = await self.parser.aget_json(file_path)
-
-        # DEBUG: inspect json_result structure
-        print(f"[ImageProcessor] json_result type={type(json_result)}, len={len(json_result) if json_result else 0}")
-        if json_result:
-            first = json_result[0]
-            print(f"[ImageProcessor] first keys={list(first.keys()) if isinstance(first, dict) else type(first)}")
-            if isinstance(first, dict):
-                has_job_id = "job_id" in first
-                has_pages = "pages" in first
-                print(f"[ImageProcessor] has job_id={has_job_id}, has pages={has_pages}")
-                if has_pages:
-                    pages = first.get("pages", [])
-                    print(f"[ImageProcessor] page count={len(pages)}")
-                    if pages:
-                        page0 = pages[0]
-                        print(f"[ImageProcessor] page[0] keys={list(page0.keys())}")
-                        print(f"[ImageProcessor] page[0] images={page0.get('images', [])}")
-
         doc_id = metadata.get("doc_id", "unknown")
         upload_dir = settings.upload_dir
         download_path = os.path.join(upload_dir, 'images', doc_id)
         os.makedirs(download_path, exist_ok=True)
 
-        images = self._download_images_from_json(json_result, download_path)
-        if not images:
-            images = self._collect_local_images(download_path)
-
-        print(f"[ImageProcessor] Found {len(images)} images from LlamaParse")
+        images = self.figure_detector.extract_figures(
+            pdf_path=file_path,
+            doc_id=doc_id,
+            output_dir=download_path,
+        )
+        print(f"[ImageProcessor] DocLayout-YOLO found {len(images)} figure crops")
 
         chunks = []
         for img_data in images:
             img_path = img_data.get("path", "")
-            page_num = self._infer_page_number(img_data)
+            page_num = int(img_data.get("page_number") or 1)
             print(f"[ImageProcessor] Processing image: path={img_path}, page={page_num}, exists={os.path.exists(img_path) if img_path else False}")
 
             if not img_path or not os.path.exists(img_path):
@@ -111,15 +82,22 @@ class ImageProcessor:
             file_size_kb = os.path.getsize(img_path) / 1024
             if file_size_kb < 15: 
                 print(f"[ImageProcessor] Skipping tiny image ({file_size_kb:.1f}KB): {img_path}")
-                os.remove(img_path)
                 continue
 
             relative_image_url = f"/uploads/images/{doc_id}/{os.path.basename(img_path)}"
-            
+
+            with open(img_path, "rb") as image_file:
+                image_bytes = image_file.read()
+            mime_type = mimetypes.guess_type(img_path)[0] or "image/png"
+            caption_data = self._caption_image_bytes(image_bytes, mime_type)
+            if not caption_data.get("caption"):
+                print(f"[ImageProcessor] Skipping non-chart/unreadable crop: {img_path}")
+                continue
+
+            chart_type = caption_data.get("chart_type", "other")
             content = (
-                "Pending chart/image crop from financial report. "
-                f"Document page {page_num}. "
-                "This image has not been analyzed yet; describe it lazily when a chart/image question needs it."
+                f"{caption_data['caption']}\n\n"
+                f"Key data: {caption_data.get('key_data') or ''}"
             )
             chunk = {
                 "id": str(uuid.uuid4()),
@@ -127,16 +105,19 @@ class ImageProcessor:
                 "metadata": {
                     **metadata,
                     "page_num": page_num,
-                    "chunk_type": "image_pending",
-                    "chart_type": "pending",
-                    "image_status": "pending",
+                    "chunk_type": "image_caption",
+                    "chart_type": chart_type,
+                    "image_status": "described",
                     "image_path": relative_image_url,
                     "local_image_path": img_path,
+                    "bbox": img_data.get("bbox"),
+                    "detection_label": img_data.get("label"),
+                    "detection_confidence": img_data.get("confidence"),
                 },
             }
             chunks.append(chunk)
 
-        print(f"[ImageProcessor] Stored {len(chunks)} pending image chunks")
+        print(f"[ImageProcessor] Created {len(chunks)} described YOLO image chunks")
         return chunks
 
     def describe_chunk(self, chunk: Dict[str, Any]) -> Dict[str, Any] | None:

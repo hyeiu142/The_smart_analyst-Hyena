@@ -21,11 +21,7 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    import asyncio
     print("Starting Hyena API...")
-    # Warm-up reranker in background so first query isn't slow
-    from backend.app.api.v1.query import rag_engine
-    asyncio.create_task(asyncio.to_thread(rag_engine.reranker._load_model))
     yield
     print("Shutting down Hyena API...")
 

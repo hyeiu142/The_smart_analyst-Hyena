@@ -130,6 +130,7 @@ body.dark .citation-tag.type-text   { background: #1a2744; }
 body.dark .doc-item.active { background: #1a2744; }
 
 .doc-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+.doc-item-actions { display: flex; align-items: center; gap: 4px; }
 .doc-item-name { font-size: 0.82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
 .doc-item-meta { font-size: 0.72rem; color: var(--text3); }
 .doc-item-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
@@ -158,6 +159,18 @@ body.dark .badge-quarter { background: #451a03; color: #fcd34d; }
 .status-processing { background: #dbeafe; color: #1d4ed8; animation: pulse 1.5s infinite; }
 .status-completed  { background: #dcfce7; color: #15803d; }
 .status-failed     { background: #fee2e2; color: #b91c1c; }
+
+.doc-delete {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 3px 5px;
+  line-height: 1;
+}
+.doc-delete:hover:not(:disabled) { background: #fee2e2; color: #b91c1c; }
+.doc-delete:disabled { cursor: not-allowed; opacity: .35; }
 
 .empty-state { color: var(--text3); font-size: 0.8rem; text-align: center; padding: 30px 10px; line-height: 1.8; }
 

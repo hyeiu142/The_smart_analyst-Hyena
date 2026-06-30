@@ -39,12 +39,7 @@ class MultiCollectionRetriever:
         query_vector = self.embedder.embed_documents(question)
         qdrant_filters = self._build_filter(filters) if filters else None
 
-        text_results = self.qdrant.search(
-            collection_name=self.qdrant.TEXT_COLLECTION,
-            query_vector=query_vector,
-            limit=top_k_text,
-            filters=qdrant_filters,
-        )
+        
         table_results = self.qdrant.search(
             collection_name=self.qdrant.TABLE_COLLECTION,
             query_vector=query_vector,

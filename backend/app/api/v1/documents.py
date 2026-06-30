@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import uuid
 from datetime import datetime
 from typing import List
@@ -144,6 +145,11 @@ async def delete_document(doc_id: str):
     doc = _get_doc(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
+    if doc.get("status") in {"pending", "processing"}:
+        raise HTTPException(
+            status_code=409,
+            detail="Document is still processing. Delete it after ingestion finishes.",
+        )
 
     from backend.app.core.retrieval.qdrant_client import QdrantClientWrapper
     qdrant = QdrantClientWrapper()
@@ -152,6 +158,10 @@ async def delete_document(doc_id: str):
     file_path = os.path.join(UPLOAD_DIR, f"{doc_id}_{doc['filename']}")
     if os.path.exists(file_path):
         os.remove(file_path)
+
+    image_dir = os.path.join(UPLOAD_DIR, "images", doc_id)
+    if os.path.isdir(image_dir):
+        shutil.rmtree(image_dir)
 
     _delete_doc(doc_id)
     return {"message": f"Document {doc_id} deleted successfully"}

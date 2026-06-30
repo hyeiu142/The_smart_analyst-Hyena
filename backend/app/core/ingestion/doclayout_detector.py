@@ -128,11 +128,12 @@ class DocLayoutFigureDetector:
         page_width: int,
         page_height: int,
         padding: int,
+        top_padding: int = 56,
     ) -> tuple[int, int, int, int]:
         x1, y1, x2, y2 = xyxy
         return (
             max(0, round(x1) - padding),
-            max(0, round(y1) - padding),
+            max(0, round(y1) - top_padding),
             min(page_width, round(x2) + padding),
             min(page_height, round(y2) + padding),
         )

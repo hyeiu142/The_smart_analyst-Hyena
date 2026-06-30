@@ -37,7 +37,10 @@ const Api = {
 
   async deleteDocument(docId) {
     const res = await fetch(`${API_BASE}/documents/${docId}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete document');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || 'Failed to delete document');
+    }
     return res.json();
   },
 

@@ -40,3 +40,4 @@ Thumbs.db
 qdrant/storage/
 Hyena-Learning/
 research/image_extraction/data/full_test/
+eval/reports/

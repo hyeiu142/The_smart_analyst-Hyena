@@ -112,7 +112,7 @@ const Chat = (() => {
     const div = document.createElement('div');
     div.className = `msg ${role}`;
     div.innerHTML = `
-      <div class="msg-avatar">${role === 'user' ? 'U' : '🐍'}</div>
+      <div class="msg-avatar">${role === 'user' ? 'U' : '✦'}</div>
       <div class="msg-body">
         <div class="msg-bubble">${role === 'user' ? escapeHtml(content) : renderMarkdown(content)}</div>
         ${sources.length ? renderCitationsHtml(sources) : ''}
@@ -130,7 +130,7 @@ const Chat = (() => {
     div.className = 'msg assistant';
     div.id = id;
     div.innerHTML = `
-      <div class="msg-avatar">🐍</div>
+      <div class="msg-avatar">✦</div>
       <div class="msg-body">
         <div class="msg-bubble">
           <div class="typing-dots"><span></span><span></span><span></span></div>

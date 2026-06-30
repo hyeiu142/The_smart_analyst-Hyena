@@ -30,6 +30,34 @@ class TestQueryAnalyzer:
         assert "data_types_needed" in result
 
 
+class TestQuerySimilarConfig:
+    """Test retrieval allocation for /query/similar."""
+
+    def test_default_retrieval_allocation(self):
+        from backend.app.api.v1.query import build_retrieval_allocation
+        from backend.app.models.query import QueryRequest
+
+        request = QueryRequest(question="Doanh thu?", top_k=10)
+
+        assert build_retrieval_allocation(request) == (10, 3, 5, 2)
+        assert request.reranker == "heuristic"
+        assert request.cross_encoder_top_n == 12
+
+    def test_explicit_retrieval_allocation(self):
+        from backend.app.api.v1.query import build_retrieval_allocation
+        from backend.app.models.query import QueryRequest
+
+        request = QueryRequest(
+            question="Doanh thu?",
+            top_k=10,
+            top_k_text=5,
+            top_k_table=8,
+            top_k_image=2,
+        )
+
+        assert build_retrieval_allocation(request) == (10, 5, 8, 2)
+
+
 class TestContextBuilder:
     """Test ContextBuilder formatting."""
 

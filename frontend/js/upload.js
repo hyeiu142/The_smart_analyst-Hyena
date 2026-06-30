@@ -141,7 +141,13 @@ const Upload = (() => {
     }, 5000);
   }
 
-  return { init, startPolling };
+  function stopPolling(docId) {
+    if (!pollingIntervals[docId]) return;
+    clearInterval(pollingIntervals[docId]);
+    delete pollingIntervals[docId];
+  }
+
+  return { init, startPolling, stopPolling };
 })();
 
 /* ═══════════════════════════════════════ DOC LIST MODULE ══ */
@@ -187,7 +193,17 @@ const DocList = (() => {
       <div class="doc-item" data-id="${d.doc_id}">
         <div class="doc-item-header">
           <span class="doc-item-name" title="${escapeHtml(d.filename)}">${escapeHtml(d.filename)}</span>
-          <span class="doc-status status-${d.status}">${statusLabel(d.status)}</span>
+          <div class="doc-item-actions">
+            <span class="doc-status status-${d.status}">${statusLabel(d.status)}</span>
+            <button
+              class="doc-delete"
+              type="button"
+              data-delete-id="${d.doc_id}"
+              title="Delete document"
+              aria-label="Delete ${escapeHtml(d.filename)}"
+              ${['pending', 'processing'].includes(d.status) ? 'disabled' : ''}
+            >🗑</button>
+          </div>
         </div>
         <div class="doc-item-badges">
           <span class="badge badge-company">${escapeHtml(d.company)}</span>
@@ -206,6 +222,28 @@ const DocList = (() => {
         // Pre-fill chat filters
         document.getElementById('chat-company').value = doc.company;
         if (doc.year) document.getElementById('chat-year').value = doc.year;
+      });
+    });
+
+    container.querySelectorAll('.doc-delete').forEach(button => {
+      button.addEventListener('click', async event => {
+        event.stopPropagation();
+        const docId = button.dataset.deleteId;
+        const doc = docs[docId];
+        if (!doc || !window.confirm(`Xóa "${doc.filename}" và toàn bộ chunks liên quan?`)) return;
+
+        button.disabled = true;
+        try {
+          await Api.deleteDocument(docId);
+          Upload.stopPolling(docId);
+          delete docs[docId];
+          render();
+          updateFilters();
+          showToast('Đã xóa tài liệu và dữ liệu vector.', 'success');
+        } catch (error) {
+          button.disabled = false;
+          showToast(`Xóa thất bại: ${error.message}`, 'error');
+        }
       });
     });
   }

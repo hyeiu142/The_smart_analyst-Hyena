@@ -5,6 +5,12 @@ class QueryRequest(BaseModel):
     """Request model for query endpoint"""
     question: str
     top_k: int = 5
+    top_k_text: Optional[int] = None
+    top_k_table: Optional[int] = None
+    top_k_image: Optional[int] = None
+    reranker: str = "heuristic"
+    reranker_model: Optional[str] = None
+    cross_encoder_top_n: int = 12
 
     company: Optional[str] = None
     year: Optional[int] = None
