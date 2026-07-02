@@ -18,6 +18,7 @@ dependencies = [
     "sentence-transformers>=5.2.3",
     "pymupdf>=1.27.2.3",
     "pillow>=10.4.0",
+    "langfuse>=2.50.0",
 ]
 
 [dependency-groups]

@@ -1,4 +1,11 @@
 from typing import Any, Dict, List, Optional
+try:
+    from langfuse import observe
+except ImportError:
+    def observe(*args, **kwargs):
+        def decorator(fn):
+            return fn
+        return decorator if args and callable(args[0]) else decorator
 from backend.app.core.retrieval.embedder import Embedder
 from backend.app.core.retrieval.qdrant_client import QdrantClientWrapper
 from backend.app.core.retrieval.reranker import (
@@ -16,6 +23,7 @@ class MultiCollectionRetriever:
         self.embedder = Embedder()
         self.qdrant = QdrantClientWrapper()
 
+    @observe()
     def retrieve(
         self, 
         question: str, 

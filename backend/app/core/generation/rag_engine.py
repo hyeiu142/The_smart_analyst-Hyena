@@ -2,13 +2,22 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 
-from openai import OpenAI
+try:
+    from langfuse.openai import OpenAI  # auto-tracks tokens + cost in Langfuse
+except ImportError:
+    from openai import OpenAI
 
 from backend.app.config import get_settings
 from backend.app.core.retrieval.retriever import MultiCollectionRetriever
 from backend.app.core.retrieval.embedder import Embedder
 from backend.app.core.cache.semantic_cache import SemanticCache
 from backend.app.core.generation.query_analyzer import QueryAnalyzer
+try:
+    from langfuse import observe
+except ImportError:
+    def observe(*args, **kwargs):
+        def decorator(fn): return fn
+        return decorator if args and callable(args[0]) else decorator
 from backend.app.core.generation.context_builder import ContextBuilder
 from backend.app.core.ingestion.image_processor import ImageProcessor
 from backend.app.core.observability.costs import estimate_openai_cost_usd
@@ -63,6 +72,7 @@ class RAGEngine:
             logger.warning(f"[RAGEngine] Cache disabled (Redis unavailable): {e}")
             return None
 
+    @observe(as_type="generation")
     async def query(
         self,
         question: str,
@@ -390,7 +400,13 @@ class RAGEngine:
             for chunk in chunks
             if chunk.get("source_collection") != "image"
         ]
-        return selected_images + non_image_chunks
+        
+        # Prioritize image chunks if query explicitly asks for charts/figures
+        question_lower = trace.question.lower()
+        if any(kw in question_lower for kw in ["biểu đồ", "hình", "chart", "figure"]):
+            return selected_images + non_image_chunks
+            
+        return non_image_chunks + selected_images
 
     def _record_selected_image_metrics(self, trace: RAGTrace, chunks: List[Dict[str, Any]]) -> None:
         selected_images = [
@@ -438,6 +454,7 @@ Please answer based on the context above. Cite sources using [Source #N] format.
         """Legacy method — giữ để backward compat."""
         return self.context_builder.build(chunks)
 
+    @observe(as_type="generation")
     async def stream_query(
         self,
         question: str,

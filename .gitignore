@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.py[oc]
 *.pyo
@@ -8,35 +7,28 @@ wheels/
 *.egg-info
 .eggs/
 
-# Virtual environments
 .venv/
 venv/
 env/
 
-# Environment variables
 .env
 .env.local
 
-# IDE
 .vscode/settings.json
 .idea/
 
-# Uploads (user data - never commit)
 uploads/
 Docs/*.pdf
 
-# Test artifacts
 .pytest_cache/
 .coverage
 htmlcov/
 *.log
 logs/
 
-# OS
 .DS_Store
 Thumbs.db
 
-# Qdrant local storage (if running outside Docker)
 qdrant/storage/
 Hyena-Learning/
 research/image_extraction/data/full_test/
